@@ -232,13 +232,57 @@
       const ws = S.searchWords(value, method);
       $('searchStatus').textContent = `${ws.length} מילים ${ws.length >= 400 ? '(מוצגות 400 ראשונות) ' : ''}ששוות ${value} בשיטת ${methodLabel(method)}:`;
       const wrap = el('div', ''); wrap.id = 'wordResults';
-      ws.forEach(w => { const c = el('span', 'res-word', w); c.onclick = () => { $('mainInput').value = w; refresh(); switchTab('values'); }; wrap.appendChild(c); });
+      ws.forEach(w => {
+        const c = el('span', 'res-word', w);
+        c.onclick = () => showContext(w, c);
+        wrap.appendChild(c);
+      });
+      box.appendChild(wrap);
+    } else if (searchScope === 'phrases') {
+      const ps = S.searchPhrases(value, method);
+      $('searchStatus').textContent = `${ps.length} צירופים ${ps.length >= 300 ? '(מוצגים 300 ראשונים) ' : ''}של 2–5 מילים עוקבות ששווים ${value} בשיטת ${methodLabel(method)}:`;
+      const wrap = el('div', ''); wrap.id = 'wordResults';
+      ps.forEach(pr => {
+        const c = el('span', 'res-word', pr.p + (pr.count > 1 ? ` <small>×${pr.count}</small>` : ''));
+        c.onclick = () => showContext(pr.p, c);
+        wrap.appendChild(c);
+      });
       box.appendChild(wrap);
     } else {
       const vs = S.searchVerses(value, method);
       $('searchStatus').textContent = `${vs.length} פסוקים ${vs.length >= 200 ? '(מוצגים 200 ראשונים) ' : ''}ששווים ${value} בשיטת ${methodLabel(method)}:`;
-      vs.forEach(v => { box.appendChild(el('div', 'res-verse', `<div class="ref">${v.r}</div><div class="txt">${v.t}</div>`)); });
+      vs.forEach(v => { box.appendChild(el('div', 'res-verse', `<div class="ref">${v.r}</div><div class="txt">${v.v || v.t}</div>`)); });
     }
+  }
+
+  // פאנל הקשר: כל ההיקרויות של מילה/צירוף, מנוקד, עם הדגשה
+  function showContext(phrase, anchorEl) {
+    // הסרת פאנל קודם
+    const old = document.getElementById('contextPanel');
+    if (old) {
+      const samePhrase = old.dataset.phrase === phrase;
+      old.remove();
+      document.querySelectorAll('.res-word.open').forEach(x => x.classList.remove('open'));
+      if (samePhrase) return; // לחיצה שנייה סוגרת
+    }
+    anchorEl.classList.add('open');
+    const occ = S.occurrences(phrase);
+    const panel = el('div', 'context-panel');
+    panel.id = 'contextPanel';
+    panel.dataset.phrase = phrase;
+    const head = el('div', 'ctx-head',
+      `<b>${phrase}</b> · ${G.hechrechi(phrase)} בהכרחי · ${occ.length} היקרויות${occ.length >= 100 ? ' (מוצגות 100)' : ''}
+       <button class="chip ctx-calc">🧮 טען למחשבון</button>`);
+    head.querySelector('.ctx-calc').onclick = () => { $('mainInput').value = phrase; refresh(); switchTab('values'); };
+    panel.appendChild(head);
+    occ.forEach(v => {
+      panel.appendChild(el('div', 'res-verse',
+        `<div class="ref">${v.r}</div><div class="txt">${S.highlight(v.v || v.t, phrase)}</div>`));
+    });
+    if (!occ.length) panel.appendChild(el('div', 'sub', 'לא נמצאו היקרויות.'));
+    // מציבים את הפאנל מיד אחרי שורת הצ'יפים
+    anchorEl.parentElement.after(panel);
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
   function methodLabel(m){return {hechrechi:'הכרחי',siduri:'סידורי',katan:'קטן',kidmi:'קדמי'}[m]||m;}
 
@@ -288,6 +332,11 @@
     if (params.get('q')) $('mainInput').value = params.get('q');
     refresh();
     if (params.get('v')) $('searchValue').value = params.get('v'); // אחרי refresh, שלא יידרס
+    const sc = params.get('s');
+    if (['words','phrases','verses'].includes(sc)) {
+      searchScope = sc;
+      document.querySelectorAll('.scope-toggle button').forEach(x => x.classList.toggle('active', x.dataset.scope === sc));
+    }
     const tab = (location.hash || '').replace('#', '');
     if (['values','ops','figurate','series','search'].includes(tab)) switchTab(tab);
   }

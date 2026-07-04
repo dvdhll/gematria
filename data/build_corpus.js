@@ -1,5 +1,7 @@
-// בונה את מאגר התנ"ך לחיפוש הפוך. מוריד מ-Sefaria, מנקה ניקוד/טעמים/HTML,
-// מחשב ערך הכרחי לכל פסוק, ושומר data/verses.json + data/meta.json.
+// בונה את מאגר התנ"ך לחיפוש הפוך. מוריד מ-Sefaria, שומר שתי גרסאות לכל פסוק:
+//   v = מנוקדת (לתצוגה: בלי טעמים/מתג/פיסוק, עם ניקוד ומקף)
+//   t = חשופה (לחישוב: בלי ניקוד, מקף -> רווח כדי שלא יודבקו מילים)
+// ומחשב ערך הכרחי g. פלט: data/verses.v2.json + data/meta.json.
 const fs = require('fs');
 const path = require('path');
 const Gem = require('../js/gematria.js');
@@ -26,12 +28,30 @@ function heNum(n) {
   return s || String(n);
 }
 
-function clean(str) {
+// טווחי יוניקוד (escapes מפורשים — לא תווים משולבים גולמיים בקוד):
+// U+0591–U+05AF טעמים · U+05BD מתג · U+05C0 פסק · U+05C3 סוף-פסוק · U+05C4–U+05C6 נקודות
+// ניקוד שנשמר: U+05B0–U+05BC, U+05C1 (שי"ן ימנית), U+05C2 (שמאלית), U+05C7 · U+05BE מקף
+const RE_TAAMIM  = /[֑-ֽ֯׀׃-׆]/g;
+const RE_KEEP_V  = /[^ְ-ׇּׁׂ־א-ת ]/g;
+const RE_NIQQUD  = /[ְ-ׇּׁׂ]/g;
+const RE_MAQAF   = /־/g;
+
+// גרסה מנוקדת לתצוגה
+function cleanVocalized(str) {
   return String(str)
-    .replace(/<[^>]+>/g, '')          // תגי HTML
-    .replace(/[֑-ׇ]/g, '')  // ניקוד וטעמים
-    .replace(/[׀-׏]/g, ' ')            // פיסוק עברי
-    .replace(/[^א-ת]+/g, ' ')// כל מה שאינו אות א..ת -> רווח
+    .replace(/<[^>]+>/g, '')            // תגי HTML
+    .replace(RE_TAAMIM, '')             // טעמים, מתג, פיסוק
+    .replace(RE_KEEP_V, ' ')            // כל השאר -> רווח (סוגריים, לועזית וכו')
+    .replace(/ ?־ ?/g, '־')   // בלי רווחים סביב מקף
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+// גרסה חשופה לחישוב
+function cleanPlain(vocalized) {
+  return vocalized
+    .replace(RE_NIQQUD, '')             // ניקוד
+    .replace(RE_MAQAF, ' ')             // מקף -> רווח (!)
+    .replace(/[^א-ת ]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -60,10 +80,11 @@ async function fetchBook(name, tries = 4) {
     let count = 0;
     text.forEach((chap, ci) => {
       chap.forEach((verseText, vi) => {
-        const t = clean(verseText);
+        const v = cleanVocalized(verseText);
+        const t = cleanPlain(v);
         if (!t) return;
         const ref = he + ' ' + heNum(ci + 1) + ':' + heNum(vi + 1);
-        verses.push({ r: ref, t, g: Gem.hechrechi(t) });
+        verses.push({ r: ref, t, v, g: Gem.hechrechi(t) });
         count++;
       });
     });
@@ -71,13 +92,19 @@ async function fetchBook(name, tries = 4) {
   }
 
   const outDir = path.join(__dirname);
-  fs.writeFileSync(path.join(outDir, 'verses.json'), JSON.stringify(verses));
+  fs.writeFileSync(path.join(outDir, 'verses.v2.json'), JSON.stringify(verses));
   const meta = {
     verses: verses.length,
     words: verses.reduce((a, v) => a + v.t.split(' ').length, 0),
-    built: 'Sefaria (Tanach with Ta\'amei Hamikra), ניקוד/טעמים הוסרו',
+    built: 'Sefaria (Tanach with Ta\'amei Hamikra); v=מנוקד, t=חשוף (מקף=רווח)',
   };
   fs.writeFileSync(path.join(outDir, 'meta.json'), JSON.stringify(meta, null, 2));
-  const kb = (fs.statSync(path.join(outDir, 'verses.json')).size / 1024).toFixed(0);
+  const kb = (fs.statSync(path.join(outDir, 'verses.v2.json')).size / 1024).toFixed(0);
   console.log(`\nסה"כ ${meta.verses} פסוקים, ${meta.words} מילים, ${kb}KB`);
+  // בדיקת שפיות: בראשית א:א
+  const first = verses[0];
+  console.log('sanity:', first.r, '| g=', first.g, '| t=', first.t);
+  console.log('vocalized:', first.v);
+  const kivrat = verses.find(x => x.t.includes('כברת ארץ'));
+  console.log('מקף פוצל?', kivrat ? 'כן — ' + kivrat.r : 'לא נמצא "כברת ארץ"');
 })();

@@ -124,6 +124,14 @@ select,input[type=number]{font-family:inherit;font-size:1rem;padding:6px 8px;bor
 .res-verse .ref{font-size:.78rem;color:var(--gold);font-weight:700}
 .res-verse .txt{font-size:1.05rem;margin-top:3px;color:var(--ink)}
 #wordResults{display:flex;flex-wrap:wrap}
+.res-word small{color:var(--muted);font-weight:400;font-size:.72em}
+.res-word.open{background:var(--navy);color:#f6f1e6;border-color:var(--navy)}
+.context-panel{background:#fbf6ea;border:1px solid var(--gold);border-radius:12px;padding:12px;margin:10px 0;box-shadow:var(--shadow)}
+.ctx-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;color:var(--navy)}
+.ctx-head .chip{cursor:pointer;border:none;font-family:inherit;font-size:.85rem}
+.context-panel .res-verse{margin-bottom:8px}
+.context-panel .txt,.res-verse .txt{line-height:1.9}
+mark{background:var(--gold-soft);color:var(--accent);font-weight:800;border-radius:4px;padding:0 2px}
 
 footer{text-align:center;color:var(--muted);font-size:.78rem;padding:18px 14px 40px}
 footer i{color:var(--navy)}

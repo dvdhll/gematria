@@ -1,9 +1,9 @@
 /* service worker — קאשינג לאופליין */
-const CACHE = 'gematria-v1';
+const CACHE = 'gematria-v2';
 const ASSETS = [
   './', './index.html', './css/styles.css',
   './js/gematria.js', './js/search.js', './js/ui.js',
-  './manifest.json', './data/verses.json',
+  './manifest.json', './data/verses.v2.json',
 ];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
