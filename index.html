@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e2a4a">
+  <title>מחשבון גימטרייה</title>
+  <meta name="description" content="מחשבון גימטרייה מתקדם — כל שיטות החישוב, פעולות הכפל, מספרים צורניים, סדרות וחתך זהב, וחיפוש הפוך בתנ״ך.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%D7%90%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>מחשבון גימטרייה<span class="crown">א</span></h1>
+    <p class="tagline">כל דרכי החישוב · פעולות · מספרים צורניים · חיפוש בתנ״ך</p>
+  </header>
+
+  <main>
+    <!-- קלט ראשי -->
+    <section class="input-card">
+      <input id="mainInput" type="text" inputmode="text" autocomplete="off"
+             placeholder="הקלד מילה, ביטוי, פסוק או מספר…" value="בראשית">
+      <div class="headline" id="headline"></div>
+    </section>
+
+    <!-- ניווט -->
+    <nav class="tabs" id="tabs">
+      <button data-tab="values" class="active">ערכי מילה</button>
+      <button data-tab="ops">פעולות</button>
+      <button data-tab="figurate">מספרים צורניים</button>
+      <button data-tab="series">סדרות</button>
+      <button data-tab="search">חיפוש בתנ״ך</button>
+    </nav>
+
+    <!-- ערכי מילה -->
+    <section class="tab" id="tab-values">
+      <div class="grid" id="valuesGrid"></div>
+      <div class="breakdown" id="breakdown" hidden></div>
+    </section>
+
+    <!-- פעולות -->
+    <section class="tab" id="tab-ops" hidden>
+      <div class="op-block">
+        <h3>הכאה פרטית <small>מכפלה אות-מול-אות של שתי מילים באותו אורך</small></h3>
+        <div class="two-inputs">
+          <input id="opA" type="text" placeholder="מילה א׳" value="אדם">
+          <span class="times">×</span>
+          <input id="opB" type="text" placeholder="מילה ב׳" value="חיה">
+        </div>
+        <div id="opResult" class="op-result"></div>
+      </div>
+
+      <div class="op-block">
+        <h3>ממוצע וכנפיים <small>ערך חלקי מספר האותיות / המילים, והסטייה השווה</small></h3>
+        <div id="avgResult" class="op-result"></div>
+      </div>
+
+      <div class="op-block">
+        <h3>נקודה אמצעית · שלם וחצי</h3>
+        <div id="midResult" class="op-result"></div>
+      </div>
+    </section>
+
+    <!-- מספרים צורניים -->
+    <section class="tab" id="tab-figurate" hidden>
+      <div class="fig-of">
+        <p>ניתוח המספר <b id="figValue">0</b> — לאילו מספרים צורניים הוא שייך:</p>
+        <div id="figIdentify" class="chips"></div>
+      </div>
+      <div class="fig-gen">
+        <h3>מחולל מספרים צורניים</h3>
+        <div class="gen-controls">
+          <select id="figType"></select>
+          <label>של n = <input id="figN" type="number" value="5" min="1" style="width:5em"></label>
+        </div>
+        <div id="figGen" class="op-result"></div>
+        <div id="figDots" class="dots"></div>
+      </div>
+    </section>
+
+    <!-- סדרות -->
+    <section class="tab" id="tab-series" hidden>
+      <div class="op-block">
+        <h3>חתך זהב <small>gs(n) = (עליון, תחתון)</small></h3>
+        <div id="goldenResult" class="op-result"></div>
+      </div>
+      <div class="op-block">
+        <h3>סדרה חיבורית <small>שחזור הסדרה שהמספר שייך אליה (כמו סדרת פיבונאצ׳י)</small></h3>
+        <div id="additiveResult" class="op-result"></div>
+      </div>
+      <div class="op-block">
+        <h3>שיטת ההפרשים <small>הקלד סדרת מספרים (מופרדים בפסיק) לחישוב משולש ההפרשים ובסיס הסדרה</small></h3>
+        <input id="diffInput" type="text" placeholder="613, 11, 6, 3, 2, 1" value="613, 11, 6, 3, 2, 1">
+        <div id="diffResult" class="op-result"></div>
+      </div>
+      <div class="op-block">
+        <h3>סדרת פיבונאצ׳י <small>״מספרי אהבה״</small></h3>
+        <div id="fibResult" class="op-result"></div>
+      </div>
+    </section>
+
+    <!-- חיפוש בתנ"ך -->
+    <section class="tab" id="tab-search" hidden>
+      <div class="search-controls">
+        <label>ערך: <input id="searchValue" type="number" value="26" style="width:7em"></label>
+        <label>שיטה:
+          <select id="searchMethod">
+            <option value="hechrechi">הכרחי</option>
+            <option value="siduri">סידורי</option>
+            <option value="katan">קטן</option>
+            <option value="kidmi">קדמי</option>
+          </select>
+        </label>
+        <div class="scope-toggle">
+          <button data-scope="words" class="active">מילים</button>
+          <button data-scope="verses">פסוקים</button>
+        </div>
+      </div>
+      <div id="searchStatus" class="search-status">טוען מאגר…</div>
+      <div id="searchResults" class="search-results"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>מבוסס על ״מבוא לגימטריא״ מתוך <i>עיניך ברכות בחשבון</i>. מאגר התנ״ך: Sefaria.</p>
+  </footer>
+
+  <script src="js/gematria.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+  </script>
+</body>
+</html>
