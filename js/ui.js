@@ -286,8 +286,8 @@
     // דיפ-לינק: ?q=טקסט  ו-#tab
     const params = new URLSearchParams(location.search);
     if (params.get('q')) $('mainInput').value = params.get('q');
-    if (params.get('v')) $('searchValue').value = params.get('v');
     refresh();
+    if (params.get('v')) $('searchValue').value = params.get('v'); // אחרי refresh, שלא יידרס
     const tab = (location.hash || '').replace('#', '');
     if (['values','ops','figurate','series','search'].includes(tab)) switchTab(tab);
   }
