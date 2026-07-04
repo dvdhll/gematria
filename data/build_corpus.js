@@ -38,13 +38,15 @@ const RE_MAQAF   = /־/g;
 
 // גרסה מנוקדת לתצוגה
 function cleanVocalized(str) {
-  return String(str)
+  const s = String(str)
     .replace(/<[^>]+>/g, '')            // תגי HTML
     .replace(RE_TAAMIM, '')             // טעמים, מתג, פיסוק
     .replace(RE_KEEP_V, ' ')            // כל השאר -> רווח (סוגריים, לועזית וכו')
     .replace(/ ?־ ?/g, '־')   // בלי רווחים סביב מקף
     .replace(/\s+/g, ' ')
     .trim();
+  // סינון סימוני פרשיות: ס/פ בודדות (בלי ניקוד) אינן מילים — ולא ייספרו בגימטרייה
+  return s.split(' ').filter(tok => tok !== 'ס' && tok !== 'פ').join(' ');
 }
 // גרסה חשופה לחישוב
 function cleanPlain(vocalized) {
