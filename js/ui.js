@@ -42,22 +42,55 @@
     renderValues(letters);
     renderNumProps();
     renderRavList();
+    autoFillPair();
     renderOps(letters);
     renderPrimes();
     renderFigurate();
     renderSeries();
-    // עדכון ברירת מחדל לחיפוש
+    // עדכון ברירת מחדל לחיפוש + ריצה מחדש אם טאב החיפוש פתוח (הצבה תכנותית לא יורה input!)
     $('searchValue').value = currentNum;
+    if (S.ready && !$('tab-search').hidden) runSearch();
+  }
+
+  // מילוי אוטומטי של ההכאה הפרטית: שתי מילים שוות-אורך במחשבון
+  function autoFillPair() {
+    const ws = G.words(currentText);
+    if (ws.length === 2 && G.onlyLetters(ws[0]).length === G.onlyLetters(ws[1]).length) {
+      $('opA').value = ws[0];
+      $('opB').value = ws[1];
+    }
+  }
+
+  // מספר -> אותיות עבריות (238 -> רל"ח)
+  function heLetters(n) {
+    if (!Number.isInteger(n) || n < 1 || n > 9999) return '';
+    let s = '', rest = n;
+    const th = Math.floor(rest / 1000);
+    if (th) { s += heLetters(th).replace(/["']/g, '') + '׳'; rest %= 1000; if (!rest) return s; }
+    while (rest >= 400) { s += 'ת'; rest -= 400; }
+    s += ['', 'ק', 'ר', 'ש'][Math.floor(rest / 100)] || ''; rest %= 100;
+    if (rest === 15) s += 'טו';
+    else if (rest === 16) s += 'טז';
+    else {
+      s += ['', 'י', 'כ', 'ל', 'מ', 'נ', 'ס', 'ע', 'פ', 'צ'][Math.floor(rest / 10)] || '';
+      s += ['', 'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט'][rest % 10] || '';
+    }
+    // גרשיים לפני האות האחרונה (אם אין כבר גרש אלפים בסוף)
+    const letters = s.replace(/׳/g, '');
+    if (letters.length > 1 && !s.endsWith('׳')) s = s.slice(0, -1) + '"' + s.slice(-1);
+    else if (letters.length === 1 && !s.endsWith('׳')) s += "'";
+    return s;
   }
 
   function renderHeadline(letters) {
     const h = $('headline');
+    const heForm = heLetters(currentNum);
     if (letters) {
       h.innerHTML = `<div class="big">${G.hechrechi(currentText)}</div>
-        <span class="big-label">ערך הכרחי</span>
+        <span class="big-label">ערך הכרחי${heForm ? ' · ' + heForm : ''}</span>
         <div class="sub">${G.letterCount(currentText)} אותיות · ${G.wordCount(currentText)} מילים</div>`;
     } else if (currentNum) {
-      h.innerHTML = `<div class="big">${currentNum}</div><span class="big-label">מספר</span>`;
+      h.innerHTML = `<div class="big">${currentNum}</div><span class="big-label">מספר${heForm ? ' · ' + heForm : ''}</span>`;
     } else {
       h.innerHTML = `<div class="sub">הקלד טקסט עברי או מספר…</div>`;
     }
@@ -147,22 +180,44 @@
 
   // רשימת הערכים של הרב ("ערכים ומראי מקומות") — נטענת פעם אחת
   let VALUES_LIST = null;
+  let VALUES_KEYS = [];   // המספרים ברשימה, ממוינים — לדפדוף לפי מספרים
   function loadValuesList() {
     fetch('data/values_list.json')
       .then(r => r.json())
-      .then(d => { VALUES_LIST = d; renderRavList(); })
+      .then(d => {
+        VALUES_LIST = d;
+        VALUES_KEYS = Object.keys(d).map(Number).sort((a, b) => a - b);
+        renderRavList();
+      })
       .catch(() => {});
+  }
+  function gotoNum(n) {
+    $('mainInput').value = String(n);
+    refresh();
   }
   function renderRavList() {
     const box = $('ravList');
-    if (!box) return;
+    if (!box || !VALUES_LIST) return;
     const n = currentNum;
-    const entries = (VALUES_LIST && n) ? VALUES_LIST[n] : null;
-    if (!entries || !entries.length) { box.hidden = true; box.innerHTML = ''; return; }
+    if (!n) { box.hidden = true; box.innerHTML = ''; return; }
+    const entries = VALUES_LIST[n] || [];
+    // דפדוף לפי מספרים: הקודם/הבא שיש להם ערכים ברשימה
+    const prev = [...VALUES_KEYS].reverse().find(k => k < n);
+    const next = VALUES_KEYS.find(k => k > n);
+    const nav =
+      `<div class="rav-nav">
+        ${prev ? `<button class="rav-go" data-go="${prev}">‹ ${prev}</button>` : '<span></span>'}
+        <span class="rav-nav-label">דפדוף ברשימה לפי מספרים</span>
+        ${next ? `<button class="rav-go" data-go="${next}">${next} ›</button>` : '<span></span>'}
+      </div>`;
     box.hidden = false;
     box.innerHTML = `<h4>ערכים ומראי מקומות · <span class="hl">${n}</span></h4>` +
-      entries.map(e => `<div class="rav-entry">${e}</div>`).join('') +
+      (entries.length
+        ? entries.map(e => `<div class="rav-entry">${e}</div>`).join('')
+        : `<div class="rav-entry sub" style="color:var(--muted)">אין ערכים למספר ${n} ברשימה.</div>`) +
+      nav +
       `<div class="rav-src">מתוך רשימת הערכים (סיון תשפ"ו)</div>`;
+    box.querySelectorAll('.rav-go').forEach(b => b.onclick = () => gotoNum(parseInt(b.dataset.go, 10)));
   }
 
   // פס תכונות המספר במסך הראשי (מתחת לרשת הערכים)
@@ -251,18 +306,75 @@
   }
 
   // ---- מספרים צורניים ----
+  // תבניות שורות (ממורכזות, שפיץ באמצע) לכל צורה דו-ממדית — לפי ציורי הספר
+  function figRows(type, n) {
+    const up = (a, b) => { const r = []; for (let i = a; i <= b; i++) r.push(i); return r; };
+    const dn = (a, b) => { const r = []; for (let i = a; i >= b; i--) r.push(i); return r; };
+    switch (type) {
+      case 'triangle': return up(1, n);
+      case 'square':   return Array(n).fill(n);
+      case 'inspire':  return n === 1 ? [1] : [...up(1, n - 1).map(i => 2 * i - 1), 2 * n - 1, ...dn(n - 1, 1).map(i => 2 * i - 1)];
+      case 'yahalom':  return [...up(1, n), ...dn(n, 1)];
+      case 'chava':    return [...dn(n, 1), ...up(2, n)];               // שעון-חול: דוקדוק משותף
+      case 'brit':     return n === 1 ? [1] : [...dn(n - 1, 1), 1, ...up(1, n - 1)]; // + נקודה באמצע
+      case 'chashmal': return [...up(1, n - 1), ...Array(n).fill(n)];   // משולש על מרובע
+      case 'bayit':    return [...up(1, n), ...Array(n).fill(n)];       // גג רחב יותר
+      case 'shabbat':  return [...up(n, 2 * n - 1), ...dn(2 * n - 2, n)]; // משושה ממורכז
+      case 'magenDavid': {
+        if (n === 1) return [1];
+        return [...up(1, n - 1), ...dn(3 * n - 2, 2 * n - 1), ...up(2 * n, 3 * n - 2), ...dn(n - 1, 1)];
+      }
+      default: return null; // מבוקע/טטרהדרל — תלת-ממדיים
+    }
+  }
+
+  // ציור SVG של צורה: נקודות בשורות ממורכזות
+  function figSvg(type, n, highlightTotal) {
+    const rows = figRows(type, n);
+    if (!rows) return null;
+    const total = rows.reduce((a, b) => a + b, 0);
+    if (total > 1300) return { tooBig: true, total };
+    const DX = 15, DY = 14, R = 4.6, PAD = 8;
+    const maxW = Math.max(...rows);
+    const w = maxW * DX + PAD * 2, h = rows.length * DY + PAD * 2;
+    let dots = '';
+    rows.forEach((len, ri) => {
+      const y = PAD + ri * DY + DY / 2;
+      const x0 = PAD + ((maxW - len) * DX) / 2 + DX / 2;
+      for (let i = 0; i < len; i++) {
+        dots += `<circle cx="${(x0 + i * DX).toFixed(1)}" cy="${y.toFixed(1)}" r="${R}" fill="#33436e"/>`;
+      }
+    });
+    return { total, svg: `<svg viewBox="0 0 ${w} ${h}" width="${Math.min(w, 420)}" xmlns="http://www.w3.org/2000/svg" role="img">${dots}</svg>` };
+  }
+
   function renderFigurate() {
     $('figValue').textContent = currentNum || 0;
     const idBox = $('figIdentify');
     idBox.innerHTML = '';
+    let hits = [];
     if (currentNum) {
-      const hits = G.identifyFigurate(currentNum);
+      hits = G.identifyFigurate(currentNum);
       if (hits.length) {
-        hits.forEach(h => idBox.appendChild(el('span', 'chip', `${G.FIGURATE[h.type].he} · האיבר ה-${h.index}`)));
+        // ציור הצורה של הערך עצמו — לא רק שם
+        hits.forEach(h => {
+          const wrap = el('div', 'fig-draw');
+          const cap = `<div class="fig-cap"><b>${G.FIGURATE[h.type].he} ה-${h.index}</b> = ${currentNum}</div>`;
+          const d = figSvg(h.type, h.index);
+          wrap.innerHTML = cap + (d ? (d.tooBig ? `<span class="sub">(${d.total} נקודות — גדול מדי לציור)</span>` : d.svg)
+                                    : '<span class="sub">(צורה תלת-ממדית)</span>');
+          idBox.appendChild(wrap);
+        });
       } else {
-        idBox.appendChild(el('span', 'chip none', 'אינו מספר צורני בסיסי'));
+        idBox.appendChild(el('span', 'chip none', `${currentNum} אינו מספר צורני בסיסי`));
       }
     } else idBox.appendChild(el('span', 'chip none', '—'));
+
+    // סנכרון המחולל לערך הנוכחי כשהוא צורני
+    if (hits.length) {
+      $('figType').value = hits[0].type;
+      $('figN').value = hits[0].index;
+    }
     renderFigGen();
   }
 
@@ -275,25 +387,12 @@
     const nth = G.figurateSeries(type, n)[n - 1];
     const list = series.map((x, i) => (i === n - 1) ? `<b>${x}</b>` : x).join(' ');
     $('figGen').innerHTML =
-      `<div>ה${t.he} <b>של ${n}</b> = <b class="r-big">${ofN}</b>` +
-      (nth !== ofN ? ` &nbsp;·&nbsp; ה${t.he} ה-${n} בסדרה = <b class="hl">${nth}</b>` : '') + `</div>
+      `<div>ה${t.he} ה-<b>${n}</b> בסדרה = <b class="r-big">${nth}</b>` +
+      (nth !== ofN ? ` &nbsp;·&nbsp; ה${t.he} <b>של ${n}</b> (כתיב עילי) = <b class="hl">${ofN}</b>` : '') + `</div>
       <div class="series-list">${list}</div>`;
-    $('figDots').innerHTML = drawDots(type, n);
-  }
-
-  function drawDots(type, n) {
-    if (n > 14) return '<span class="sub">(גדול מדי לציור)</span>';
-    let rows = [];
-    if (type === 'triangle' || type === 'yahalom' || type === 'chava') {
-      for (let i = 1; i <= n; i++) rows.push('● '.repeat(i));
-    } else if (type === 'square') {
-      for (let i = 0; i < n; i++) rows.push('● '.repeat(n));
-    } else if (type === 'cube') {
-      return '<span class="sub">' + n + '×' + n + '×' + n + ' = ' + (n*n*n) + '</span>';
-    } else {
-      return '';
-    }
-    return rows.map(r => `<div class="r">${r.trim()}</div>`).join('');
+    const d = figSvg(type, n);
+    $('figDots').innerHTML = d ? (d.tooBig ? `<span class="sub">(${d.total} נקודות — גדול מדי לציור)</span>` : d.svg)
+                               : `<span class="sub">צורה תלת-ממדית (${t.he}) — אין ציור שטוח</span>`;
   }
 
   // ---- סדרות ----
@@ -408,7 +507,7 @@
   function switchTab(name) {
     document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
     document.querySelectorAll('.tab').forEach(t => t.hidden = (t.id !== 'tab-' + name));
-    if (name === 'search' && !S.ready) initSearch();
+    if (name === 'search') { if (!S.ready) initSearch(); else runSearch(); }
   }
 
   function round(x){ return Math.round(x*1000)/1000; }
