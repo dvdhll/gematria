@@ -108,8 +108,9 @@
     }
     METHODS.forEach(m => {
       const v = m.fn(currentText);
+      const disp = fmtNum(v);
       const card = el('div', 'val-card' + (m.primary ? ' primary' : ''));
-      card.innerHTML = `<div class="name">${m.name}</div><div class="value">${v}</div><div class="desc">${m.desc}</div>`;
+      card.innerHTML = `<div class="name">${m.name}</div><div class="value${String(disp).length > 9 ? ' long' : ''}">${disp}</div><div class="desc">${m.desc}</div>`;
       card.onclick = () => showBreakdown(m);
       grid.appendChild(card);
     });
@@ -514,6 +515,12 @@
 
   function round(x){ return Math.round(x*1000)/1000; }
   function plural(n, one, many){ return n === 1 ? one : n + ' ' + many; }
+  // פורמט מספרים גדולים: מפרידי אלפים (גם למחרוזות BigInt מההכאה)
+  function fmtNum(v){
+    if (typeof v === 'string') return v.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    if (typeof v === 'number' && Math.abs(v) >= 1000000) return v.toLocaleString('en-US');
+    return v;
+  }
 
   // ---- אתחול ----
   function init() {

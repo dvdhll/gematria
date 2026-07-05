@@ -166,13 +166,14 @@
   }
 
   // ---- פעולות "הכפל" --------------------------------------------------------
-  // הכאה: מכפלת כל האותיות של מילה
+  // הכאה: מכפלת כל האותיות של מילה (BigInt — מכפלות של פסוקים חורגות מדיוק Number;
+  // מוחזר Number כשבטוח, אחרת מחרוזת ספרות מדויקת)
   function hakaah(text) {
     const s = onlyLetters(text);
     if (!s) return 0;
-    let prod = 1;
-    for (const ch of s) prod *= letterValue(ch, 'hechrechi');
-    return prod;
+    let prod = 1n;
+    for (const ch of s) prod *= BigInt(letterValue(ch, 'hechrechi'));
+    return prod <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(prod) : prod.toString();
   }
   // הכאה פרטית: מכפלה סקלרית — אות מול אות, לשתי מילים באותו אורך
   function hakaahPratit(a, b) {
