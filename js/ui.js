@@ -40,6 +40,7 @@
     }
     renderHeadline(letters);
     renderValues(letters);
+    renderNumProps();
     renderOps(letters);
     renderPrimes();
     renderFigurate();
@@ -141,6 +142,38 @@
     const rows = res.parts.map(p => `<td>${p.a}·${p.b}<br><b>${p.v1}×${p.v2}</b><br>${p.prod}</td>`).join('');
     box.innerHTML = `<table><tr>${rows}</tr></table>
       <div style="margin-top:8px">סכום = <b class="r-big">${res.total}</b></div>`;
+  }
+
+  // פס תכונות המספר במסך הראשי (מתחת לרשת הערכים)
+  function renderNumProps() {
+    const box = $('numProps');
+    const n = currentNum;
+    if (!n || n < 2) { box.hidden = true; box.innerHTML = ''; return; }
+    box.hidden = false;
+
+    const f = G.factorize(n);
+    const prime = G.isPrimeNum(n);
+    const dv = G.divisorsOf(n);
+    const ys = G.yesod(n);
+    const mk = G.makor(n);
+
+    const items = [];
+    if (prime) {
+      const idx = G.primeIndex(n);
+      items.push(`<span class="np-item np-prime">ראשוני!${idx ? ` ה-<b>${idx}</b> בסדרה` : ''}</span>`);
+    } else {
+      items.push(`<span class="np-item"><span class="np-label">פירוק</span><b>${f.map(x => x.p + sup(x.k)).join('×')}</b></span>`);
+    }
+    items.push(`<span class="np-item"><span class="np-label">סכום מחלקים</span><b>${dv.sum}</b></span>`);
+    if (!prime && ys != null) items.push(`<span class="np-item"><span class="np-label">יסוד</span><b>${ys}</b></span>`);
+    if (mk && !prime) items.push(`<span class="np-item"><span class="np-label">מקור</span><b>${mk.value}</b></span>`);
+    if (mk && !prime && ys != null) items.push(`<span class="np-item"><span class="np-label">יסוד+מקור</span><b>${ys + mk.value}</b></span>`);
+    // זיהוי צורני — רק אם יש
+    const figs = G.identifyFigurate(n);
+    figs.forEach(h => items.push(`<span class="np-item np-fig">${G.FIGURATE[h.type].he} ה-${h.index}</span>`));
+
+    box.innerHTML = `<span class="np-title">המספר ${n}:</span> ${items.join('')} <button class="np-more">לפרטים ←</button>`;
+    box.querySelector('.np-more').onclick = () => { switchTab('primes'); history.replaceState(null, '', '#primes'); };
   }
 
   // ---- ראשוניים ----
