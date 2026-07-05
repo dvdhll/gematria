@@ -12,8 +12,12 @@
   <link rel="stylesheet" href="css/styles.css">
   <!-- ערכת צבע לפני הצביעה (בלי הבהוב) — עוברת מלשקוד דרך ?theme=, נשמרת מקומית -->
   <script>(function(){try{
+    var q=new URLSearchParams(location.search);
+    // מצב מוטמע: כשלשקוד פותח את המחשבון בתוך iframe (?embed=1) — מסתירים את כפתור "לשקוד"
+    // (החזרה מתבצעת מכותרת לשקוד עצמה) ואת באנר ההתקנה. מסמנים מוקדם כדי שלא יהבהב.
+    if(q.get('embed')==='1')document.documentElement.classList.add('embedded');
     var V=['light','contrast','neurim-light','neurim-dark','dark'];
-    var p=new URLSearchParams(location.search).get('theme');
+    var p=q.get('theme');
     if(V.indexOf(p)>=0)localStorage.setItem('gemTheme',p);
     var t=(V.indexOf(p)>=0)?p:localStorage.getItem('gemTheme');
     if(V.indexOf(t)<0)t='dark';                 /* ברירת מחדל כמו לשקוד */
@@ -21,6 +25,7 @@
     var BG={dark:'#0d0b07',light:'#f2e7cc',contrast:'#000000','neurim-light':'#f5f2ff','neurim-dark':'#15131f'};
     var mc=document.querySelector('meta[name=theme-color]'); if(mc)mc.content=BG[t]||BG.dark;
   }catch(e){}})();</script>
+  <style>html.embedded .back-lishkod{display:none}html.embedded .install-banner{display:none!important}</style>
 </head>
 <body>
   <!-- באנר התקנה (מוצג לפי מכשיר, רק כשלא מותקן) -->
