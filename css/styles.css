@@ -237,6 +237,9 @@ select,input[type=number]{font-family:inherit;font-size:1rem;padding:6px 8px;bor
 .search-status{margin:12px 2px;color:var(--muted);font-size:.9rem}
 .search-results{display:flex;flex-direction:column;gap:8px}
 .res-word{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:3px;font-size:1.15rem;font-weight:700;color:var(--navy);cursor:pointer}
+.res-word.src{background:var(--gold);color:var(--on-accent);border-color:var(--gold);font-weight:800}
+.res-word.src::before{content:"★ ";font-size:.8em}
+.res-word.src.open{filter:brightness(.92)}
 .res-word:hover{border-color:var(--gold)}
 .res-verse{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;box-shadow:var(--shadow)}
 .res-verse .ref{font-size:.78rem;color:var(--gold);font-weight:700}

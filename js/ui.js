@@ -440,9 +440,20 @@
     box.innerHTML = '';
     if (!value) { box.innerHTML = '<span class="sub">הזן ערך.</span>'; return; }
     if (searchScope === 'words') {
-      const ws = S.searchWords(value, method);
-      $('searchStatus').textContent = `${ws.length} מילים ${ws.length >= 400 ? '(מוצגות 400 ראשונות) ' : ''}ששוות ${value} בשיטת ${methodLabel(method)}:`;
+      let ws = S.searchWords(value, method);
+      // המילה/הביטוי שממנו חושב הערך — ראשונה ומודגשת (גם אם אינה בתנ״ך)
+      const srcText = G.words(currentText).join(' ');
+      const srcLetters = G.onlyLetters(currentText);
+      const srcMatches = srcLetters && S.valueByMethod(srcText, method) === value;
+      if (srcMatches) ws = ws.filter(w => w !== srcLetters);
+      $('searchStatus').textContent = `${ws.length + (srcMatches ? 1 : 0)} מילים ${ws.length >= 400 ? '(מוצגות 400 ראשונות) ' : ''}ששוות ${value} בשיטת ${methodLabel(method)}:`;
       const wrap = el('div', ''); wrap.id = 'wordResults';
+      if (srcMatches) {
+        const c = el('span', 'res-word src', srcText);
+        c.title = 'המילה שלך';
+        c.onclick = () => showContext(srcText, c);
+        wrap.appendChild(c);
+      }
       ws.forEach(w => {
         const c = el('span', 'res-word', w);
         c.onclick = () => showContext(w, c);
