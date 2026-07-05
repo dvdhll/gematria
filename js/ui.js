@@ -185,7 +185,7 @@
     } else {
       const mapping = mk.map.map(x => `${x.p}→<b>${x.idx}</b>${sup(x.k)}`).join(' · ');
       $('primeMakor').innerHTML =
-        `<div class="sub">${mapping}</div>
+        `<div class="sub" style="direction:ltr;text-align:right">${mapping}</div>
          ${mk.map.map(x => Array(x.k).fill(x.idx).join(' × ')).join(' × ')} = <b class="r-big">${mk.value}</b>${findBtn(mk.value)}`;
     }
 
