@@ -205,6 +205,13 @@
       var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
       if (standalone || localStorage.getItem('gemInstallDismissed')) return;
 
+      // הגעה מתוך לשקוד → בלי באנר התקנה (סימון לכל המושב, גם אחרי ניווט פנימי/רענון)
+      var refHost = (function () { try { return new URL(document.referrer).hostname; } catch (e) { return ''; } })();
+      var fromLishkod = new URLSearchParams(location.search).get('from') === 'lishkod'
+        || refHost === 'lishkod.app' || refHost === 'www.lishkod.app'
+        || sessionStorage.getItem('gemFromLishkod') === '1';
+      if (fromLishkod) { try { sessionStorage.setItem('gemFromLishkod', '1'); } catch (e) {} return; }
+
       function show() { banner.hidden = false; }
       function hide(remember) {
         banner.hidden = true;
