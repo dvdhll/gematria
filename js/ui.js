@@ -41,6 +41,7 @@
     renderHeadline(letters);
     renderValues(letters);
     renderNumProps();
+    renderRavList();
     renderOps(letters);
     renderPrimes();
     renderFigurate();
@@ -142,6 +143,26 @@
     const rows = res.parts.map(p => `<td>${p.a}·${p.b}<br><b>${p.v1}×${p.v2}</b><br>${p.prod}</td>`).join('');
     box.innerHTML = `<table><tr>${rows}</tr></table>
       <div style="margin-top:8px">סכום = <b class="r-big">${res.total}</b></div>`;
+  }
+
+  // רשימת הערכים של הרב ("ערכים ומראי מקומות") — נטענת פעם אחת
+  let VALUES_LIST = null;
+  function loadValuesList() {
+    fetch('data/values_list.json')
+      .then(r => r.json())
+      .then(d => { VALUES_LIST = d; renderRavList(); })
+      .catch(() => {});
+  }
+  function renderRavList() {
+    const box = $('ravList');
+    if (!box) return;
+    const n = currentNum;
+    const entries = (VALUES_LIST && n) ? VALUES_LIST[n] : null;
+    if (!entries || !entries.length) { box.hidden = true; box.innerHTML = ''; return; }
+    box.hidden = false;
+    box.innerHTML = `<h4>ערכים ומראי מקומות · <span class="hl">${n}</span></h4>` +
+      entries.map(e => `<div class="rav-entry">${e}</div>`).join('') +
+      `<div class="rav-src">מתוך רשימת הערכים (סיון תשפ"ו)</div>`;
   }
 
   // פס תכונות המספר במסך הראשי (מתחת לרשת הערכים)
@@ -419,6 +440,7 @@
     if (params.get('q')) $('mainInput').value = params.get('q');
     refresh();
     if (params.get('v')) $('searchValue').value = params.get('v'); // אחרי refresh, שלא יידרס
+    loadValuesList();
     const sc = params.get('s');
     if (['words','phrases','verses'].includes(sc)) {
       searchScope = sc;
