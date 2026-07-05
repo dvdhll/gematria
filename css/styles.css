@@ -105,14 +105,14 @@ main{max-width:820px;margin:0 auto;padding:0 14px 60px}
 .headline .big-label{display:block;font-size:.75rem;color:var(--muted);margin-top:2px}
 .headline .sub{font-size:.85rem;color:var(--muted);margin-top:6px}
 
-/* טאבים */
-.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
+/* טאבים — כולם גלויים תמיד; בטלפון נשברים לשתי שורות (בלי גלילה צידית!) */
+.tabs{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;padding-bottom:4px;margin-bottom:14px}
 .tabs button{
   flex:0 0 auto;background:var(--card);border:1px solid var(--line);color:var(--muted);
   padding:9px 15px;border-radius:999px;font-size:.9rem;font-family:inherit;cursor:pointer;
   white-space:nowrap;transition:.15s;
 }
+@media(max-width:520px){ .tabs button{padding:8px 12px;font-size:.85rem} }
 .tabs button.active{background:var(--gold);color:var(--on-accent);border-color:var(--gold);font-weight:700}
 
 /* רשת ערכים */
