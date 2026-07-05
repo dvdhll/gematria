@@ -1,9 +1,18 @@
 # Cloudflare Pages headers
+# מעטפת האפליקציה (HTML/CSS/JS) — שמות קבצים קבועים ולכן חייבים אימות-מחדש בכל טעינה
+# (אחרת edge-cache מגיש גרסה ישנה עד יום שלם אחרי פריסה). ה-SW דואג לאופליין.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+/js/*
+  Cache-Control: public, max-age=0, must-revalidate
+/css/*
+  Cache-Control: public, max-age=0, must-revalidate
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+# נכסים גדולים/יציבים — מותר מטמון ארוך
 /data/*
   Cache-Control: public, max-age=604800
-/js/*
-  Cache-Control: public, max-age=86400
-/css/*
-  Cache-Control: public, max-age=86400
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable
