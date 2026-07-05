@@ -20,6 +20,8 @@
     { key: 'merubaKlali', name: 'מרובע כללי', desc: 'הערך בריבוע', fn: t => G.merubaKlali(t) },
     { key: 'merubaPrati', name: 'מרובע פרטי', desc: 'סכום ריבועי האותיות', fn: t => G.merubaPrati(t) },
     { key: 'hakaah',    name: 'הכאה', desc: 'מכפלת האותיות', fn: t => G.hakaah(t) },
+    { key: 'letterCount', name: 'מספר אותיות', desc: 'ספירת האותיות', fn: t => G.letterCount(t) },
+    { key: 'wordCount',   name: 'מספר מילים', desc: 'ספירת המילים', fn: t => G.wordCount(t) },
   ];
 
   let currentText = '';
@@ -88,7 +90,7 @@
     if (letters) {
       h.innerHTML = `<div class="big">${G.hechrechi(currentText)}</div>
         <span class="big-label">ערך הכרחי${heForm ? ' · ' + heForm : ''}</span>
-        <div class="sub">${G.letterCount(currentText)} אותיות · ${G.wordCount(currentText)} מילים</div>`;
+        <div class="sub">${plural(G.letterCount(currentText), 'אות אחת', 'אותיות')} · ${plural(G.wordCount(currentText), 'מילה אחת', 'מילים')}</div>`;
     } else if (currentNum) {
       h.innerHTML = `<div class="big">${currentNum}</div><span class="big-label">מספר${heForm ? ' · ' + heForm : ''}</span>`;
     } else {
@@ -211,7 +213,7 @@
         ${next ? `<button class="rav-go" data-go="${next}">${next} ›</button>` : '<span></span>'}
       </div>`;
     box.hidden = false;
-    box.innerHTML = `<h4>ערכים ומראי מקומות · <span class="hl">${n}</span></h4>` +
+    box.innerHTML = `<h4>ערכים · <span class="hl">${n}</span></h4>` +
       (entries.length
         ? entries.map(e => `<div class="rav-entry">${e}</div>`).join('')
         : `<div class="rav-entry sub" style="color:var(--muted)">אין ערכים למספר ${n} ברשימה.</div>`) +
@@ -511,6 +513,7 @@
   }
 
   function round(x){ return Math.round(x*1000)/1000; }
+  function plural(n, one, many){ return n === 1 ? one : n + ' ' + many; }
 
   // ---- אתחול ----
   function init() {
