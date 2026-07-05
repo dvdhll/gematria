@@ -1,10 +1,10 @@
 /* service worker — קאשינג לאופליין */
-const CACHE = 'gematria-v4';
+const CACHE = 'gematria-v5';
 const ASSETS = [
   './', './index.html', './css/styles.css',
   './js/gematria.js', './js/search.js', './js/ui.js',
   './manifest.json', './data/verses.v2.json', './data/values_list.json',
-  './fonts/assistant-hebrew.woff2', './fonts/assistant-latin.woff2',
+  './fonts/assistant-hebrew.woff2', './fonts/KeterYG-Medium.ttf', './fonts/assistant-latin.woff2',
 ];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
