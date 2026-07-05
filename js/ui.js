@@ -346,7 +346,7 @@
       const y = PAD + ri * DY + DY / 2;
       const x0 = PAD + ((maxW - len) * DX) / 2 + DX / 2;
       for (let i = 0; i < len; i++) {
-        dots += `<circle cx="${(x0 + i * DX).toFixed(1)}" cy="${y.toFixed(1)}" r="${R}" fill="#9a7520"/>`;
+        dots += `<circle cx="${(x0 + i * DX).toFixed(1)}" cy="${y.toFixed(1)}" r="${R}" style="fill:var(--accent)"/>`;
       }
     });
     return { total, svg: `<svg viewBox="0 0 ${w} ${h}" width="${Math.min(w, 420)}" xmlns="http://www.w3.org/2000/svg" role="img">${dots}</svg>` };
