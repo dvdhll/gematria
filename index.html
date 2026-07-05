@@ -24,6 +24,15 @@
     if(t!=='dark')document.documentElement.classList.add(t);
     var BG={dark:'#0d0b07',light:'#f2e7cc',contrast:'#000000','neurim-light':'#f5f2ff','neurim-dark':'#15131f'};
     var mc=document.querySelector('meta[name=theme-color]'); if(mc)mc.content=BG[t]||BG.dark;
+    // פונט התנ״ך — זהה לבחירה בלשקוד (?font=), נשמר מקומית; ברירת מחדל SBL
+    var F={sbl:"'SBL Hebrew',serif",frank:"'Taamey Frank CLM',serif",keter:"'Keter YG',serif",
+           shofar:"'Shofar',serif",stam:"'Shlomo SemiStam',serif",
+           arial:"'Arial Unicode MS','Arial',sans-serif",assistant:"'Assistant',sans-serif"};
+    var fp=q.get('font');
+    if(F[fp])localStorage.setItem('gemFont',fp);
+    var fid=F[fp]?fp:localStorage.getItem('gemFont');
+    if(!F[fid])fid='sbl';                        /* ברירת מחדל SBL */
+    document.documentElement.style.setProperty('--font-tanakh',F[fid]);
   }catch(e){}})();</script>
   <style>html.embedded .back-lishkod{display:none}html.embedded .install-banner{display:none!important}</style>
 </head>
@@ -178,6 +187,13 @@
     <p>מבוסס על ״מבוא לגימטריא״ מתוך <i>עיניך ברכות בחשבון</i>. מאגר התנ״ך: Sefaria.</p>
   </footer>
 
+  <!-- תפריט בחירת טקסט (כמו בלשקוד): בחירת מילה → ערכה + טעינה למחשבון -->
+  <div id="gemSel" role="menu" aria-label="פעולות על טקסט מסומן">
+    <button class="gs-copy" role="menuitem">העתקה</button>
+    <div class="gs-sep"></div>
+    <button class="gs-calc" role="menuitem"></button>
+  </div>
+
   <script src="js/gematria.js"></script>
   <script src="js/search.js"></script>
   <script src="js/ui.js"></script>
@@ -185,6 +201,68 @@
     // SW רק בפרודקשן — ב-localhost הוא מגיש קבצים ישנים ומפריע לפיתוח
     if ('serviceWorker' in navigator && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1')
       navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+    // ---- תפריט בחירת טקסט: טעינת מילה למחשבון (באותה שיטה כמו בלשקוד) ----
+    (function () {
+      var menu = document.getElementById('gemSel');
+      var btnCopy = menu.querySelector('.gs-copy');
+      var btnCalc = menu.querySelector('.gs-calc');
+      var cur = '';
+      var isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      var coarse = window.matchMedia && matchMedia('(pointer:coarse)').matches;
+      if (coarse) menu.classList.add('touch');
+      function heb(s){ return (s||'').replace(/[^א-ת]/g,''); }
+      function val(s){ return (window.Gem ? Gem.hechrechi(s) : 0); }
+      function hide(){ menu.classList.remove('on'); cur=''; }
+      function show(){
+        var sel = window.getSelection();
+        if (!sel || sel.isCollapsed || !sel.rangeCount) { hide(); return; }
+        var an = sel.anchorNode && sel.anchorNode.parentElement;
+        if (an && an.closest('input,textarea,[contenteditable],#gemSel')) { hide(); return; }
+        var text = String(sel).trim();
+        if (heb(text).length < 2 || text.length > 300) { hide(); return; }
+        cur = text;
+        btnCalc.textContent = 'גימטריה · ' + val(text);
+        var r; try { r = sel.getRangeAt(0).getBoundingClientRect(); } catch(e){ hide(); return; }
+        if (!r || (!r.width && !r.height)) { hide(); return; }
+        menu.classList.add('on');
+        var mw = menu.offsetWidth, vw = window.innerWidth || document.documentElement.clientWidth || 360;
+        if (isIOS) { menu.classList.add('bar'); menu.style.left = Math.max(8,(vw-mw)/2)+'px'; menu.style.top=''; return; }
+        var mh = menu.offsetHeight;
+        var x = Math.max(8, Math.min(r.left + r.width/2 - mw/2, vw - mw - 8));
+        var y = r.top - mh - 10; if (y < 8) y = r.bottom + 10;
+        menu.style.left = x + 'px'; menu.style.top = y + 'px';
+      }
+      var t = null;
+      document.addEventListener('selectionchange', function(){ clearTimeout(t); t = setTimeout(show, 180); });
+      window.addEventListener('scroll', function(){ if (isIOS) return; if (menu.classList.contains('on')) { clearTimeout(t); t = setTimeout(show, 120); } }, {passive:true, capture:true});
+      document.addEventListener('contextmenu', function(e){
+        var sel = window.getSelection(); if (!sel || sel.isCollapsed) return;
+        var an = sel.anchorNode && sel.anchorNode.parentElement;
+        if (an && an.closest('input,textarea,[contenteditable]')) return;
+        if (heb(String(sel)).length >= 2) e.preventDefault();
+      });
+      btnCopy.addEventListener('click', function(){
+        var txt = cur;
+        var done = function(){ btnCopy.textContent = 'הועתק ✓'; setTimeout(function(){ btnCopy.textContent='העתקה'; hide(); }, 700); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, done);
+        else { try{ document.execCommand('copy'); }catch(_){} done(); }
+      });
+      btnCalc.addEventListener('click', function(){
+        if (!cur) return;
+        var inp = document.getElementById('mainInput');
+        // מנקים ניקוד/טעמים (מקף → רווח) כדי שהקלט יהיה נקי; הערך זהה
+        inp.value = cur.replace(/־/g, ' ').replace(/[֑-ׇ]/g, '').replace(/\s+/g, ' ').trim();
+        inp.dispatchEvent(new Event('input', {bubbles:true}));   // מפעיל את refresh() של המחשבון
+        var vt = document.querySelector('.tabs [data-tab=values]'); if (vt) vt.click();
+        try { window.getSelection().removeAllRanges(); } catch(_){}
+        hide();
+        window.scrollTo({ top:0, behavior:'smooth' });
+      });
+      document.addEventListener('pointerdown', function(e){
+        if (!menu.contains(e.target)) { var s = window.getSelection(); if (!s || s.isCollapsed) hide(); }
+      });
+    })();
 
     // חזרה ללשקוד: אם הגענו משם — history.back() משמר את מצב האפליקציה
     document.getElementById('backLishkod').addEventListener('click', function (e) {

@@ -10,11 +10,12 @@
   font-weight:200 800;font-style:normal;font-display:swap;
   unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
 }
-@font-face{
-  font-family:'Keter YG';
-  src:url('../fonts/KeterYG-Medium.ttf') format('truetype');
-  font-weight:500;font-style:normal;font-display:swap;
-}
+/* פונטי התנ״ך — זהים ללשקוד; רק הנבחר בפועל יורד (הדפדפן טוען @font-face לפי שימוש) */
+@font-face{ font-family:'Keter YG'; src:url('../fonts/KeterYG-Medium.ttf') format('truetype'); font-weight:500;font-style:normal;font-display:swap; }
+@font-face{ font-family:'SBL Hebrew'; src:url('../fonts/SBLHebrew.ttf') format('truetype'); font-weight:400;font-style:normal;font-display:swap; }
+@font-face{ font-family:'Taamey Frank CLM'; src:url('../fonts/TaameyFrankCLM-Medium.ttf') format('truetype'); font-weight:400 700;font-style:normal;font-display:swap; }
+@font-face{ font-family:'Shofar'; src:url('../fonts/ShofarRegular.ttf') format('truetype'); font-weight:400;font-style:normal;font-display:swap; }
+@font-face{ font-family:'Shlomo SemiStam'; src:url('../fonts/ShlomoSemiStam.ttf') format('truetype'); font-weight:400;font-style:normal;font-display:swap; }
 /* ═══ ערכות צבע — זהות ללִשְׁקֹד. מיושמות כ-class על <html> (light/contrast/neurim-*);
    ברירת מחדל (ללא class) = כהה, בדיוק כמו לשקוד. הערכה עוברת מלשקוד דרך ?theme= ═══ */
 :root{ /* dark — ברירת המחדל של לשקוד */
@@ -22,6 +23,7 @@
   --comment:#ddd2b6; --comment-bg:#ffffff0d; --border:#f5e6c026;
   --green:#6fae6a; --red:#d98a4a; --on-accent:#1a140a; --radius:18px;
   --gold-soft:#e3bd5726; --shadow:0 8px 32px #00000045;
+  --font-tanakh:'SBL Hebrew', serif;   /* ברירת מחדל SBL; הסקריפט ב-head דורס לפי ?font= מלשקוד */
 }
 .light{
   --bg:#f2e7cc; --card:#fdf9ee; --accent:#9a7520; --text:#2c2415; --muted:#8a7a54;
@@ -47,7 +49,6 @@
 body{
   --ink:var(--text); --gold:var(--accent); --line:var(--border);
   --navy:var(--text); --navy2:var(--muted); --well:var(--comment-bg); --ok:var(--green,#16a06b);
-  --font-tanakh:'Keter YG', serif;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -57,6 +58,24 @@ body{
   -webkit-text-size-adjust:100%;
 }
 main{max-width:820px;margin:0 auto;padding:0 14px 60px}
+
+/* תפריט בחירת טקסט (כמו בלשקוד) */
+#gemSel{
+  position:fixed;z-index:2147483000;display:flex;gap:6px;padding:6px;
+  background:var(--card);border:1px solid var(--line);border-radius:999px;
+  box-shadow:0 6px 24px #00000040;
+  opacity:0;pointer-events:none;transform:translateY(4px);transition:opacity .12s,transform .12s;
+}
+#gemSel.on{opacity:1;pointer-events:auto;transform:translateY(0)}
+#gemSel button{
+  border:none;background:transparent;color:var(--ink);font-family:inherit;
+  font-size:13.5px;font-weight:700;padding:6px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;
+}
+#gemSel button:active{background:var(--comment-bg)}
+#gemSel .gs-calc{color:var(--gold)}
+#gemSel .gs-sep{width:1px;background:var(--line);margin:4px 0}
+#gemSel.bar{bottom:calc(16px + env(safe-area-inset-bottom,0px));top:auto!important;box-shadow:0 10px 30px #00000055}
+#gemSel.bar button,#gemSel.touch button{font-size:15px;padding:9px 18px}
 
 /* באנר התקנה — דק, ממורכז, בלי אייקון */
 .install-banner{
