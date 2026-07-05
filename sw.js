@@ -1,9 +1,9 @@
 /* service worker — קאשינג לאופליין */
-const CACHE = 'gematria-v5';
+const CACHE = 'gematria-v6';
 const ASSETS = [
   './', './index.html', './css/styles.css',
   './js/gematria.js', './js/search.js', './js/ui.js',
-  './manifest.json', './data/verses.v2.json', './data/values_list.json',
+  './manifest.json', './icon-192.png', './data/verses.v2.json', './data/values_list.json',
   './fonts/assistant-hebrew.woff2', './fonts/KeterYG-Medium.ttf', './fonts/assistant-latin.woff2',
 ];
 self.addEventListener('install', e => {

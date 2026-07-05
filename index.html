@@ -7,10 +7,18 @@
   <title>מחשבון גימטרייה</title>
   <meta name="description" content="מחשבון גימטרייה מתקדם — כל שיטות החישוב, פעולות הכפל, מספרים צורניים, סדרות וחתך זהב, וחיפוש הפוך בתנ״ך.">
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%D7%90%3C/text%3E%3C/svg%3E">
+  <link rel="icon" href="icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+  <!-- באנר התקנה (מוצג לפי מכשיר, רק כשלא מותקן) -->
+  <div id="installBanner" class="install-banner" hidden>
+    <img src="icon-192.png" alt="" class="ib-icon">
+    <div class="ib-text" id="installText"></div>
+    <button id="installBtn" class="ib-btn" hidden>התקנה</button>
+    <button id="installClose" class="ib-close" aria-label="סגירה">✕</button>
+  </div>
   <header class="topbar">
     <h1>מחשבון גימטרייה<span class="crown">א</span></h1>
     <p class="tagline">כל דרכי החישוב · פעולות · מספרים צורניים · חיפוש בתנ״ך</p>
@@ -159,6 +167,51 @@
   <script src="js/ui.js"></script>
   <script>
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+    // ---- באנר התקנה, מותאם למכשיר ----
+    (function () {
+      var banner = document.getElementById('installBanner');
+      var txt = document.getElementById('installText');
+      var btn = document.getElementById('installBtn');
+      var close = document.getElementById('installClose');
+      var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      if (standalone || localStorage.getItem('gemInstallDismissed')) return;
+
+      function show() { banner.hidden = false; }
+      function hide(remember) {
+        banner.hidden = true;
+        if (remember) localStorage.setItem('gemInstallDismissed', '1');
+      }
+      close.addEventListener('click', function () { hide(true); });
+      window.addEventListener('appinstalled', function () { hide(true); });
+
+      var ua = navigator.userAgent;
+      var isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+      if (isIOS) {
+        // באייפון/אייפד אין prompt — מציגים הוראות
+        txt.innerHTML = 'להתקנה במכשיר: לחצו על <b>שיתוף</b> <span class="ib-ios">⎋</span> ואז <b>הוסף למסך הבית</b>';
+        show();
+      } else {
+        // אנדרואיד / דסקטופ: מחכים לאירוע ההתקנה של הדפדפן
+        var deferred = null;
+        window.addEventListener('beforeinstallprompt', function (e) {
+          e.preventDefault();
+          deferred = e;
+          txt.innerHTML = 'התקינו את <b>מחשבון הגימטרייה</b> במכשיר — עובד גם בלי אינטרנט';
+          btn.hidden = false;
+          show();
+        });
+        btn.addEventListener('click', function () {
+          if (!deferred) return;
+          deferred.prompt();
+          deferred.userChoice.then(function (c) {
+            if (c && c.outcome === 'accepted') hide(true); else hide(false);
+          });
+          deferred = null;
+        });
+      }
+    })();
   </script>
 </body>
 </html>
