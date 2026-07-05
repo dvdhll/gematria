@@ -307,6 +307,78 @@
     return rows; // rows[rows.length-1] הוא "בסיס הסדרה"
   }
 
+  // ---- ראשוניים: פירוק, מחלקים, יסוד ומקור -----------------------------------
+  // פירוק לגורמים ראשוניים: מחזיר [{p, k}]
+  function factorize(n) {
+    n = Math.floor(Math.abs(n));
+    if (n < 2) return [];
+    const out = [];
+    for (let d = 2; d * d <= n; d += (d === 2 ? 1 : 2)) {
+      if (n % d === 0) {
+        let k = 0;
+        while (n % d === 0) { n /= d; k++; }
+        out.push({ p: d, k });
+      }
+    }
+    if (n > 1) out.push({ p: n, k: 1 });
+    return out;
+  }
+  function isPrimeNum(n) {
+    const f = factorize(n);
+    return f.length === 1 && f[0].k === 1;
+  }
+  // כל המחלקים + סכומם
+  function divisorsOf(n) {
+    const f = factorize(n);
+    if (!f.length) return { list: n === 1 ? [1] : [], sum: n === 1 ? 1 : 0 };
+    let list = [1];
+    for (const { p, k } of f) {
+      const cur = [];
+      let pw = 1;
+      for (let i = 0; i <= k; i++) { for (const d of list) cur.push(d * pw); pw *= p; }
+      list = cur;
+    }
+    list.sort((a, b) => a - b);
+    return { list, sum: list.reduce((a, b) => a + b, 0) };
+  }
+  // מיקום ראשוני בסדרה *כשמונים את 1 כאיבר הראשון*: 1→1, 2→2, 3→3, 5→4, 7→5, 11→6…
+  // (המוסכמה בספר: index(p) = 1 + מספר הראשוניים עד p)
+  const PRIME_INDEX_LIMIT = 10000000; // מעבר לזה לא מחשבים (סינון זיכרון)
+  function primeIndex(p) {
+    if (p === 1) return 1;
+    if (!isPrimeNum(p) || p > PRIME_INDEX_LIMIT) return null;
+    // ספירת ראשוניים עד p (נפה פשוטה)
+    const sieve = new Uint8Array(p + 1);
+    let count = 0;
+    for (let i = 2; i <= p; i++) {
+      if (!sieve[i]) {
+        count++;
+        if (i * i <= p) for (let j = i * i; j <= p; j += i) sieve[j] = 1;
+      }
+    }
+    return count + 1; // +1 עבור 1 שנספר ראשון
+  }
+  // יסוד המספר: סכום המרכיבים הראשוניים (ללא 1), עם כפילויות (8=2·2·2 → 6)
+  function yesod(n) {
+    const f = factorize(n);
+    if (!f.length) return null;
+    return f.reduce((a, { p, k }) => a + p * k, 0);
+  }
+  // מקור המספר: מכפלת מיקומי הגורמים הראשוניים בסדרה (החל מ-1), עם כפילויות
+  function makor(n) {
+    const f = factorize(n);
+    if (!f.length) return n === 1 ? 1 : null;
+    let prod = 1;
+    const map = [];
+    for (const { p, k } of f) {
+      const idx = primeIndex(p);
+      if (idx == null) return null;
+      map.push({ p, k, idx });
+      prod *= Math.pow(idx, k);
+    }
+    return { value: prod, map };
+  }
+
   // ---- ריכוז כל השיטות לביטוי אחד ------------------------------------------
   function analyze(text) {
     const t = onlyLetters(text);
@@ -343,6 +415,7 @@
     memutza, wings, midpoint,
     figurateSeries, figurateOf, identifyFigurate,
     goldenSection, additiveSeriesFor, fibonacci, differenceTriangle,
+    factorize, isPrimeNum, divisorsOf, primeIndex, yesod, makor,
     analyze,
   };
 

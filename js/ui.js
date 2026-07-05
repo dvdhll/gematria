@@ -41,6 +41,7 @@
     renderHeadline(letters);
     renderValues(letters);
     renderOps(letters);
+    renderPrimes();
     renderFigurate();
     renderSeries();
     // עדכון ברירת מחדל לחיפוש
@@ -140,6 +141,59 @@
     const rows = res.parts.map(p => `<td>${p.a}·${p.b}<br><b>${p.v1}×${p.v2}</b><br>${p.prod}</td>`).join('');
     box.innerHTML = `<table><tr>${rows}</tr></table>
       <div style="margin-top:8px">סכום = <b class="r-big">${res.total}</b></div>`;
+  }
+
+  // ---- ראשוניים ----
+  const SUP = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+  const sup = k => k === 1 ? '' : String(k).split('').map(d => SUP[+d]).join('');
+  // כפתור חיפוש-בתנ"ך קטן ליד תוצאה
+  const findBtn = v => (v >= 2 && v <= 500000)
+    ? ` <button class="chip mini-find" onclick="GemUI.searchFor(${v},'hechrechi')">🔍 ${v} בתנ״ך</button>` : '';
+
+  function renderPrimes() {
+    const n = currentNum;
+    const boxes = ['primeFactor','primeDivisors','primeYesod','primeMakor','primeYM'];
+    if (!n || n < 2) { boxes.forEach(id => $(id).innerHTML = '<span class="sub">הזן טקסט או מספר (2 ומעלה).</span>'); return; }
+
+    const f = G.factorize(n);
+    // פירוק
+    if (G.isPrimeNum(n)) {
+      const idx = G.primeIndex(n);
+      $('primeFactor').innerHTML = `<b class="r-big">${n}</b> ראשוני!` +
+        (idx ? ` <span class="eq-note" style="display:inline-block">ה-<b>${idx}</b> בסדרת הראשוניים (כשמונים את 1: 1, 2, 3, 5, 7, 11…)</span>` : '');
+    } else {
+      $('primeFactor').innerHTML = `${n} = <b class="r-big">${f.map(x => x.p + sup(x.k)).join(' × ')}</b>`;
+    }
+
+    // מחלקים
+    const dv = G.divisorsOf(n);
+    const many = dv.list.length > 48;
+    $('primeDivisors').innerHTML =
+      `<div class="series-list">${(many ? dv.list.slice(0, 48) : dv.list).join(' ')}${many ? ' …' : ''}</div>
+       <div style="margin-top:6px">${dv.list.length} מחלקים · סכום: <b class="r-big">${dv.sum}</b>${findBtn(dv.sum)}</div>`;
+
+    // יסוד
+    const ys = G.yesod(n);
+    $('primeYesod').innerHTML = G.isPrimeNum(n)
+      ? `<span class="sub">מספר ראשוני — היסוד הוא המספר עצמו: <b class="hl">${ys}</b></span>`
+      : `${f.map(x => Array(x.k).fill(x.p).join(' + ')).join(' + ')} = <b class="r-big">${ys}</b>${findBtn(ys)}`;
+
+    // מקור
+    const mk = G.makor(n);
+    if (!mk) {
+      $('primeMakor').innerHTML = '<span class="sub">גורם ראשוני גדול מדי לחישוב המיקום.</span>';
+    } else {
+      const mapping = mk.map.map(x => `${x.p}→<b>${x.idx}</b>${sup(x.k)}`).join(' · ');
+      $('primeMakor').innerHTML =
+        `<div class="sub">${mapping}</div>
+         ${mk.map.map(x => Array(x.k).fill(x.idx).join(' × ')).join(' × ')} = <b class="r-big">${mk.value}</b>${findBtn(mk.value)}`;
+    }
+
+    // יסוד + מקור
+    if (mk && ys != null) {
+      const t = ys + mk.value;
+      $('primeYM').innerHTML = `${ys} + ${mk.value} = <b class="r-big">${t}</b>${findBtn(t)}`;
+    } else $('primeYM').innerHTML = '<span class="sub">—</span>';
   }
 
   // ---- מספרים צורניים ----
@@ -338,7 +392,7 @@
       document.querySelectorAll('.scope-toggle button').forEach(x => x.classList.toggle('active', x.dataset.scope === sc));
     }
     const tab = (location.hash || '').replace('#', '');
-    if (['values','ops','figurate','series','search'].includes(tab)) switchTab(tab);
+    if (['values','ops','primes','figurate','series','search'].includes(tab)) switchTab(tab);
   }
   document.addEventListener('DOMContentLoaded', init);
 })();

@@ -103,5 +103,26 @@ eq('פיבונאצי', Gem.fibonacci(12), [1,1,2,3,5,8,13,21,34,55,89,144]);
 // זיהוי צורני: 26 מופיע כ...(יהלם? לא). 351 משולש של 26.
 eq('351 הוא משולש', Gem.identifyFigurate(351).some(h => h.type==='triangle'), true);
 
+// ראשוניים — הדוגמה של הרב: 913
+eq('913 = 11×83', Gem.factorize(913), [{p:11,k:1},{p:83,k:1}]);
+eq('סכום מחלקי 913 = 1008', Gem.divisorsOf(913).sum, 1008);
+eq('מחלקי 913', Gem.divisorsOf(913).list, [1,11,83,913]);
+eq('1008 = 7×144', 1008 / 144, 7);
+eq('יסוד 913 = 94', Gem.yesod(913), 94);
+eq('מיקום 11 (מונים את 1) = 6', Gem.primeIndex(11), 6);
+eq('מיקום 83 (מונים את 1) = 24', Gem.primeIndex(83), 24);
+eq('מקור 913 = 144', Gem.makor(913).value, 144);
+eq('קדם = 144', Gem.hechrechi('קדם'), 144);
+eq('יסוד+מקור 913 = 238 = רחל', Gem.yesod(913) + Gem.makor(913).value, Gem.hechrechi('רחל'));
+// מקרי קצה
+eq('primeIndex(1) = 1', Gem.primeIndex(1), 1);
+eq('primeIndex(2) = 2', Gem.primeIndex(2), 2);
+eq('primeIndex(7) = 5', Gem.primeIndex(7), 5);
+eq('8 = 2^3', Gem.factorize(8), [{p:2,k:3}]);
+eq('יסוד 8 = 6 (עם כפילויות)', Gem.yesod(8), 6);
+eq('מקור 8 = 8 (2→2, 2·2·2)', Gem.makor(8).value, 8);
+eq('26 ראשוני? לא', Gem.isPrimeNum(26), false);
+eq('83 ראשוני? כן', Gem.isPrimeNum(83), true);
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

@@ -28,6 +28,7 @@
     <nav class="tabs" id="tabs">
       <button data-tab="values" class="active">ערכי מילה</button>
       <button data-tab="ops">פעולות</button>
+      <button data-tab="primes">ראשוניים</button>
       <button data-tab="figurate">מספרים צורניים</button>
       <button data-tab="series">סדרות</button>
       <button data-tab="search">חיפוש בתנ״ך</button>
@@ -59,6 +60,30 @@
       <div class="op-block">
         <h3>נקודה אמצעית · שלם וחצי</h3>
         <div id="midResult" class="op-result"></div>
+      </div>
+    </section>
+
+    <!-- ראשוניים -->
+    <section class="tab" id="tab-primes" hidden>
+      <div class="op-block">
+        <h3>פירוק לגורמים ראשוניים</h3>
+        <div id="primeFactor" class="op-result"></div>
+      </div>
+      <div class="op-block">
+        <h3>מחלקים <small>כל המחלקים של המספר וסכומם</small></h3>
+        <div id="primeDivisors" class="op-result"></div>
+      </div>
+      <div class="op-block">
+        <h3>יסוד <small>סכום המרכיבים הראשוניים (ללא 1)</small></h3>
+        <div id="primeYesod" class="op-result"></div>
+      </div>
+      <div class="op-block">
+        <h3>מקור <small>מכפלת מיקומי הגורמים בסדרת הראשוניים — כשמונים את 1 כאיבר הראשון (1,2,3,5,7,11…)</small></h3>
+        <div id="primeMakor" class="op-result"></div>
+      </div>
+      <div class="op-block">
+        <h3>יסוד + מקור</h3>
+        <div id="primeYM" class="op-result"></div>
       </div>
     </section>
 

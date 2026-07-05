@@ -132,6 +132,7 @@ select,input[type=number]{font-family:inherit;font-size:1rem;padding:6px 8px;bor
 .context-panel .res-verse{margin-bottom:8px}
 .context-panel .txt,.res-verse .txt{line-height:1.9}
 mark{background:var(--gold-soft);color:var(--accent);font-weight:800;border-radius:4px;padding:0 2px}
+.mini-find{border:none;cursor:pointer;font-family:inherit;font-size:.78rem;margin-inline-start:8px;vertical-align:middle}
 
 footer{text-align:center;color:var(--muted);font-size:.78rem;padding:18px 14px 40px}
 footer i{color:var(--navy)}
