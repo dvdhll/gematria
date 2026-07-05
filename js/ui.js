@@ -207,11 +207,12 @@
     // דפדוף לפי מספרים: הקודם/הבא שיש להם ערכים ברשימה
     const prev = [...VALUES_KEYS].reverse().find(k => k < n);
     const next = VALUES_KEYS.find(k => k > n);
+    // RTL: "הקודם" בימין עם חץ ימינה בצד החיצוני; "הבא" בשמאל עם חץ שמאלה
     const nav =
       `<div class="rav-nav">
-        ${prev ? `<button class="rav-go" data-go="${prev}">‹ ${prev}</button>` : '<span></span>'}
+        ${prev ? `<button class="rav-go" data-go="${prev}">${prev} ›</button>` : '<span></span>'}
         <span class="rav-nav-label">דפדוף ברשימה לפי מספרים</span>
-        ${next ? `<button class="rav-go" data-go="${next}">${next} ›</button>` : '<span></span>'}
+        ${next ? `<button class="rav-go" data-go="${next}">‹ ${next}</button>` : '<span></span>'}
       </div>`;
     box.hidden = false;
     box.innerHTML = `<h4>ערכים · <span class="hl">${n}</span></h4>` +

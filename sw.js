@@ -1,5 +1,5 @@
 /* service worker — קאשינג לאופליין */
-const CACHE = 'gematria-v7';
+const CACHE = 'gematria-v8';
 const ASSETS = [
   './', './index.html', './css/styles.css',
   './js/gematria.js', './js/search.js', './js/ui.js',
@@ -7,7 +7,10 @@ const ASSETS = [
   './fonts/assistant-hebrew.woff2', './fonts/KeterYG-Medium.ttf', './fonts/assistant-latin.woff2',
 ];
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  // cache:'reload' — עוקף את קאש ה-HTTP של הדפדפן, שאחרת עלול להזין גרסאות ישנות לקאש החדש
+  e.waitUntil(caches.open(CACHE).then(c =>
+    c.addAll(ASSETS.map(u => new Request(u, { cache: 'reload' })))
+  ).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
