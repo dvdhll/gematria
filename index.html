@@ -14,12 +14,12 @@
 <body>
   <!-- באנר התקנה (מוצג לפי מכשיר, רק כשלא מותקן) -->
   <div id="installBanner" class="install-banner" hidden>
-    <img src="icon-192.png" alt="" class="ib-icon">
-    <div class="ib-text" id="installText"></div>
+    <span class="ib-text" id="installText"></span>
     <button id="installBtn" class="ib-btn" hidden>התקנה</button>
     <button id="installClose" class="ib-close" aria-label="סגירה">✕</button>
   </div>
   <header class="topbar">
+    <a href="https://lishkod.app/" id="backLishkod" class="back-lishkod"><span aria-hidden="true">→</span><span>לִשְׁקֹד</span></a>
     <h1>מחשבון גימטרייה<span class="crown">א</span></h1>
     <p class="tagline">כל דרכי החישוב · פעולות · מספרים צורניים · חיפוש בתנ״ך</p>
   </header>
@@ -167,6 +167,16 @@
   <script src="js/ui.js"></script>
   <script>
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+    // חזרה ללשקוד: אם הגענו משם — history.back() משמר את מצב האפליקציה
+    document.getElementById('backLishkod').addEventListener('click', function (e) {
+      try {
+        if (document.referrer && new URL(document.referrer).hostname.endsWith('lishkod.app') && history.length > 1) {
+          e.preventDefault();
+          history.back();
+        }
+      } catch (_) {}
+    });
 
     // ---- באנר התקנה, מותאם למכשיר ----
     (function () {
