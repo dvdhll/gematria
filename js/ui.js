@@ -32,6 +32,7 @@
   function refresh() {
     const raw = $('mainInput').value;
     currentText = raw;
+    const sb = $('searchBox'); if (sb) sb.classList.toggle('has-text', raw.length > 0);
     const letters = G.onlyLetters(raw);
     if (letters) {
       currentNum = G.hechrechi(raw);
@@ -541,6 +542,7 @@
     Object.keys(G.FIGURATE).forEach(k => { const o = el('option', '', G.FIGURATE[k].he); o.value = k; sel.appendChild(o); });
 
     $('mainInput').addEventListener('input', refresh);
+    if ($('clearInput')) $('clearInput').addEventListener('click', () => { $('mainInput').value = ''; refresh(); $('mainInput').focus(); });
     $('opA').addEventListener('input', renderHakaahPratit);
     $('opB').addEventListener('input', renderHakaahPratit);
     $('figType').addEventListener('change', renderFigGen);
