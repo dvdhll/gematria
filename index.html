@@ -203,8 +203,14 @@
   <script src="js/ui.js"></script>
   <script>
     // SW רק בפרודקשן — ב-localhost הוא מגיש קבצים ישנים ומפריע לפיתוח
-    if ('serviceWorker' in navigator && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1')
+    if ('serviceWorker' in navigator && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
       navigator.serviceWorker.register('sw.js').catch(()=>{});
+      // כשגרסת SW חדשה משתלטת — רענון חד-פעמי כדי לקבל CSS/JS עדכני (סוף לתצוגה ישנה תקועה)
+      var swRefreshed = false;
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        if (swRefreshed) return; swRefreshed = true; location.reload();
+      });
+    }
 
     // ---- תפריט בחירת טקסט: טעינת מילה למחשבון (באותה שיטה כמו בלשקוד) ----
     (function () {
