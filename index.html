@@ -34,7 +34,7 @@
     if(!F[fid])fid='sbl';                        /* ברירת מחדל SBL */
     document.documentElement.style.setProperty('--font-tanakh',F[fid]);
   }catch(e){}})();</script>
-  <style>html.embedded .back-lishkod{display:none}html.embedded .install-banner{display:none!important}</style>
+  <style>html.embedded .lishkod-logo{display:none}html.embedded .install-banner{display:none!important}</style>
 </head>
 <body>
   <!-- באנר התקנה (מוצג לפי מכשיר, רק כשלא מותקן) -->
@@ -44,9 +44,13 @@
     <button id="installClose" class="ib-close" aria-label="סגירה">✕</button>
   </div>
   <header class="topbar">
-    <a href="https://lishkod.app/" id="backLishkod" class="back-lishkod"><span aria-hidden="true">→</span><span>לִשְׁקֹד</span></a>
-    <h1>מחשבון גימטרייה<span class="crown">א</span></h1>
-    <p class="tagline">כל דרכי החישוב · פעולות · מספרים צורניים · חיפוש בתנ״ך</p>
+    <div class="topbar-inner">
+      <a href="https://lishkod.app/" id="backLishkod" class="lishkod-logo" title="לשקוד" aria-label="פתיחת לשקוד">
+        <img src="lishkod-logo.png" alt="לשקוד" width="46" height="46">
+      </a>
+      <h1>מחשבון גימטרייה<span class="crown">א</span></h1>
+      <p class="tagline">כל דרכי החישוב · פעולות · מספרים צורניים · חיפוש בתנ״ך</p>
+    </div>
   </header>
 
   <main>
