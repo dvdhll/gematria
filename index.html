@@ -253,13 +253,23 @@
       if (coarse) menu.classList.add('touch');
       function heb(s){ return (s||'').replace(/[^א-ת]/g,''); }
       function val(s){ return (window.Gem ? Gem.hechrechi(s) : 0); }
+      // חילוץ טקסט הבחירה תוך הסרת אלמנטים שאינם חלק מהפסוק — בעיקר מראי-מקום
+      // (.ref, מספרי פרק:פסוק באותיות עבריות) וניווט הרשימה. כמו selText בלשקוד.
+      function selText(sel){
+        try{
+          var d = document.createElement('div');
+          d.appendChild(sel.getRangeAt(0).cloneContents());
+          d.querySelectorAll('.ref,.rav-nav,.rav-src,.np-label,.big-label').forEach(function(e){ e.remove(); });
+          return d.textContent;
+        }catch(_){ return String(sel); }
+      }
       function hide(){ menu.classList.remove('on'); cur=''; }
       function show(){
         var sel = window.getSelection();
         if (!sel || sel.isCollapsed || !sel.rangeCount) { hide(); return; }
         var an = sel.anchorNode && sel.anchorNode.parentElement;
         if (an && an.closest('input,textarea,[contenteditable],#gemSel')) { hide(); return; }
-        var text = String(sel).trim();
+        var text = selText(sel).trim();
         if (heb(text).length < 2 || text.length > 300) { hide(); return; }
         cur = text;
         btnCalc.textContent = 'גימטריא · ' + val(text);
