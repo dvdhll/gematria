@@ -132,7 +132,9 @@ eq('הקרי לא נספר', Gem.hechrechi('(תנואון) [תניאון]'), Gem
 eq('words: כתיב בלבד', Gem.words('(תנואון) [תניאון]'), ['תנואון']);
 eq('סימן פרשה {פ} מושמט', Gem.hechrechi('נח {פ}'), Gem.hechrechi('נח'));
 eq('סימן פרשה {ס} מושמט', Gem.hechrechi('את {ס}'), Gem.hechrechi('את'));
-eq('מסורה [בסוגריים מרובעים] מושמטת', Gem.hechrechi('שלום [מסורה]'), Gem.hechrechi('שלום'));
+eq('מסורה *(עיגול+אסטריסק) מושמטת', Gem.hechrechi('שלום *(מסורה)'), Gem.hechrechi('שלום'));
+eq('כתיב (עיגול בלי אסטריסק) נשמר, מסורה *(עם) מושמטת',
+   Gem.hechrechi('(כתיב) *(מסורה)'), Gem.hechrechi('כתיב'));
 eq('טקסט רגיל ללא סימונים — ללא שינוי', Gem.hechrechi('בראשית'), 913);
 
 console.log(`\n${pass} passed, ${fail} failed`);
