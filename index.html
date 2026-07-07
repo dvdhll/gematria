@@ -16,6 +16,8 @@
     // מצב מוטמע: כשלשקוד פותח את המחשבון בתוך iframe (?embed=1) — מסתירים את כפתור "לשקוד"
     // (החזרה מתבצעת מכותרת לשקוד עצמה) ואת באנר ההתקנה. מסמנים מוקדם כדי שלא יהבהב.
     if(q.get('embed')==='1')document.documentElement.classList.add('embedded');
+    // אפליקציה עטופה (Median/GoNative) — מסתירים לוגו לשקוד ובאנר התקנה (כבר "מותקן")
+    if(/median|gonative/i.test(navigator.userAgent))document.documentElement.classList.add('median');
     var V=['light','contrast','neurim-light','neurim-dark','dark'];
     var p=q.get('theme');
     if(V.indexOf(p)>=0)localStorage.setItem('gemTheme',p);
@@ -37,7 +39,7 @@
     if(!F[fid])fid='sbl';                        /* ברירת מחדל SBL */
     document.documentElement.style.setProperty('--font-tanakh',F[fid]);
   }catch(e){}})();</script>
-  <style>html.embedded .lishkod-logo{display:none}html.embedded .install-banner{display:none!important}</style>
+  <style>html.embedded .lishkod-logo,html.median .lishkod-logo{display:none}html.embedded .install-banner,html.median .install-banner{display:none!important}</style>
 </head>
 <body>
   <!-- באנר התקנה (מוצג לפי מכשיר, רק כשלא מותקן) -->
