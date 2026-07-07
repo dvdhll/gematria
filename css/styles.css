@@ -239,9 +239,9 @@ main{max-width:820px;margin:0 auto;padding:0 14px 60px}
 .op-block h3{margin:0 0 4px;color:var(--navy);font-size:1.05rem}
 .op-block h3 small,.op-block small{display:block;font-weight:400;color:var(--muted);font-size:.78rem;margin-top:2px}
 .two-inputs{display:flex;align-items:center;gap:10px;margin:10px 0}
-.two-inputs input{flex:1;font-size:1.2rem;text-align:center;padding:8px;border:1px solid var(--line);border-radius:8px;font-family:inherit;background:var(--well);color:var(--navy);font-weight:700}
+.two-inputs input{flex:1 1 0;min-width:0;font-size:1.2rem;text-align:center;padding:8px;border:1px solid var(--line);border-radius:8px;font-family:inherit;background:var(--well);color:var(--navy);font-weight:700}
 .times{font-size:1.3rem;color:var(--gold);font-weight:800}
-.op-result{font-size:.95rem;margin-top:8px}
+.op-result{font-size:.95rem;margin-top:8px;overflow-x:auto}   /* טבלאות רחבות (הכאה פרטית) יגללו בתוך הכרטיס במקום לשבור את העמוד */
 .op-result .r-big{font-size:1.6rem;font-weight:800;color:var(--accent)}
 .op-result table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.9rem}
 .op-result td,.op-result th{border:1px solid var(--line);padding:5px 8px;text-align:center}
