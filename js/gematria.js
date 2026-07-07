@@ -62,17 +62,26 @@
   }
 
   // ---- ניקוי טקסט -----------------------------------------------------------
-  // משאיר רק אותיות עבריות; מסיר ניקוד, טעמים, פיסוק, ספרות.
+  // סימוני מקרא: החישוב לפי ה"כתיב" בלבד.
+  //  • כתיב  (בסוגריים עגולים)  — נכלל בחישוב, מסירים רק את הסוגריים.
+  //  • קרי + מסורה (בסוגריים מרובעים) — מושמטים לגמרי.
+  //  • סימני פרשה פתוחה/סתומה {פ}/{ס} (בסוגריים מסולסלים) — מושמטים.
+  function stripNotation(str) {
+    return String(str)
+      .replace(/\[[^\]]*\]/g, ' ')   // קרי + מסורה — הסרה
+      .replace(/\{[^}]*\}/g, ' ')    // סימני פרשה — הסרה
+      .replace(/[()]/g, '');          // סוגריים עגולים — הסרת התו, שמירת הכתיב
+  }
+  // משאיר רק אותיות עבריות; מסיר סימוני מקרא, ניקוד, טעמים, פיסוק, ספרות.
   function onlyLetters(str) {
     if (!str) return '';
-    // הסרת ניקוד/טעמים (U+0591–U+05C7) ותווים שאינם אותיות א–ת/סופיות
-    return String(str)
+    return stripNotation(String(str))
       .replace(/[֑-ׇ]/g, '')          // ניקוד וטעמים
       .replace(/[^א-ת]/g, '');          // רק א..ת + סופיות
   }
   function words(str) {
     if (!str) return [];
-    return String(str)
+    return stripNotation(String(str))
       .replace(/[֑-ׇ]/g, '')
       .split(/[^א-ת]+/)
       .filter(Boolean);
@@ -408,7 +417,7 @@
   // ---- ייצוא ----------------------------------------------------------------
   const API = {
     LETTER, BASE, FINAL_GADOL, FINAL_TO_BASE, ORDER, MILUI, FIGURATE, PHI,
-    onlyLetters, words, letterValue, digitalRoot, digitSum, letterCount, wordCount,
+    onlyLetters, words, stripNotation, letterValue, digitalRoot, digitSum, letterCount, wordCount,
     hechrechi, siduri, katan, kidmi,
     katanMispari, katanMispariAcharon, katanMispariSheni,
     imHakolel, mosaf, merubaKlali, merubaPrati, milui,

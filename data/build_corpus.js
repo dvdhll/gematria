@@ -36,10 +36,19 @@ const RE_KEEP_V  = /[^ְ-ׇּׁׂ־א-ת ]/g;
 const RE_NIQQUD  = /[ְ-ׇּׁׂ]/g;
 const RE_MAQAF   = /־/g;
 
+// הסרת סימוני מקרא של Sefaria לפני הניקוי:
+//  • קרי (mam-kq-q, בסוגריים מרובעים) — מושמט; הכתיב (mam-kq-k, עגולים) נשאר.
+//  • סימני פרשה פתוחה/סתומה (mam-spi-*, {פ}/{ס}) — מושמטים.
+function stripSefariaNotes(html) {
+  return String(html)
+    .replace(/<span class="mam-kq-q">[^<]*<\/span>/g, ' ')       // קרי — הסרה
+    .replace(/<span class="mam-spi-[^"]*">[^<]*<\/span>/g, ' ');  // פרשה — הסרה
+}
+
 // גרסה מנוקדת לתצוגה
 function cleanVocalized(str) {
-  const s = String(str)
-    .replace(/<[^>]+>/g, '')            // תגי HTML
+  const s = stripSefariaNotes(str)
+    .replace(/<[^>]+>/g, '')            // תגי HTML (עוטף mam-kq-k מוסר, הכתיב נשאר)
     .replace(RE_TAAMIM, '')             // טעמים, מתג, פיסוק
     .replace(RE_KEEP_V, ' ')            // כל השאר -> רווח (סוגריים, לועזית וכו')
     .replace(/ ?־ ?/g, '־')   // בלי רווחים סביב מקף

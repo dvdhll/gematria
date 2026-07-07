@@ -124,5 +124,16 @@ eq('מקור 8 = 8 (2→2, 2·2·2)', Gem.makor(8).value, 8);
 eq('26 ראשוני? לא', Gem.isPrimeNum(26), false);
 eq('83 ראשוני? כן', Gem.isPrimeNum(83), true);
 
+// קרי/כתיב, פרשה, מסורה — החישוב לפי הכתיב בלבד
+eq('כתיב בלבד (עגולים נכללים, מרובעים מושמטים)',
+   Gem.hechrechi('וְלָ֣מָּה (תנואון) [תְנִיא֔וּן] אֶת־לֵ֖ב'),
+   Gem.hechrechi('ולמה תנואון את לב'));
+eq('הקרי לא נספר', Gem.hechrechi('(תנואון) [תניאון]'), Gem.hechrechi('תנואון'));
+eq('words: כתיב בלבד', Gem.words('(תנואון) [תניאון]'), ['תנואון']);
+eq('סימן פרשה {פ} מושמט', Gem.hechrechi('נח {פ}'), Gem.hechrechi('נח'));
+eq('סימן פרשה {ס} מושמט', Gem.hechrechi('את {ס}'), Gem.hechrechi('את'));
+eq('מסורה [בסוגריים מרובעים] מושמטת', Gem.hechrechi('שלום [מסורה]'), Gem.hechrechi('שלום'));
+eq('טקסט רגיל ללא סימונים — ללא שינוי', Gem.hechrechi('בראשית'), 913);
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
