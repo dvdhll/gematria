@@ -535,11 +535,75 @@
     return v;
   }
 
+  // ---- הגדרות: ערכת צבעים + גודל טקסט ----
+  const THEMES = [
+    { id: 'light',        label: 'בהיר',        bg: '#f2e7cc', accent: '#9a7520' },
+    { id: 'dark',         label: 'כהה',         bg: '#0d0b07', accent: '#e3bd57' },
+    { id: 'neurim-light', label: 'צבעוני בהיר', bg: '#f5f2ff', accent: '#6d3bf5' },
+    { id: 'neurim-dark',  label: 'צבעוני כהה',  bg: '#15131f', accent: '#ece4ff' },
+    { id: 'contrast',     label: 'ניגודיות',    bg: '#000000', accent: '#ffff00' },
+  ];
+  const SIZES = [{ v: 0.85, label: 'קטן' }, { v: 1, label: 'רגיל' }, { v: 1.18, label: 'גדול' }, { v: 1.4, label: 'ענק' }];
+  const THEME_IDS = THEMES.map(t => t.id);
+
+  function currentTheme() { const t = localStorage.getItem('gemTheme'); return THEME_IDS.includes(t) ? t : 'dark'; }
+  function currentScale() { const s = parseFloat(localStorage.getItem('gemScale')); return (s >= 0.7 && s <= 1.6) ? s : 1; }
+
+  function setTheme(id) {
+    document.documentElement.classList.remove('light', 'contrast', 'neurim-light', 'neurim-dark');
+    if (id !== 'dark') document.documentElement.classList.add(id);
+    localStorage.setItem('gemTheme', id);
+    const th = THEMES.find(t => t.id === id);
+    const mc = document.querySelector('meta[name=theme-color]'); if (mc && th) mc.content = th.bg;
+    document.querySelectorAll('#themeGrid .theme-opt').forEach(b => b.classList.toggle('active', b.dataset.id === id));
+    // צביעת ציורי הצורות מחדש (משתמשים ב-currentColor דרך CSS var — יתעדכן אוטומטית)
+  }
+  function setScale(v) {
+    document.documentElement.style.fontSize = (16 * v) + 'px';
+    localStorage.setItem('gemScale', String(v));
+    document.querySelectorAll('#sizeRow .size-opt').forEach(b => b.classList.toggle('active', parseFloat(b.dataset.v) === v));
+  }
+
+  function buildSettings() {
+    const grid = $('themeGrid');
+    if (grid && !grid.children.length) {
+      THEMES.forEach(t => {
+        const b = el('button', 'theme-opt');
+        b.type = 'button'; b.dataset.id = t.id;
+        b.innerHTML = `<span class="sw" style="background:${t.bg};border-color:${t.accent}"></span>${t.label}`;
+        b.onclick = () => setTheme(t.id);
+        grid.appendChild(b);
+      });
+    }
+    const row = $('sizeRow');
+    if (row && !row.children.length) {
+      SIZES.forEach(s => {
+        const b = el('button', 'size-opt');
+        b.type = 'button'; b.dataset.v = s.v;
+        b.innerHTML = `<span class="a" style="font-size:${Math.round(16 * s.v)}px">א</span><span class="lbl">${s.label}</span>`;
+        b.onclick = () => setScale(s.v);
+        row.appendChild(b);
+      });
+    }
+    // סימון הבחירה הנוכחית
+    document.querySelectorAll('#themeGrid .theme-opt').forEach(b => b.classList.toggle('active', b.dataset.id === currentTheme()));
+    document.querySelectorAll('#sizeRow .size-opt').forEach(b => b.classList.toggle('active', parseFloat(b.dataset.v) === currentScale()));
+  }
+
+  function openSettings() { buildSettings(); $('settingsOverlay').hidden = false; }
+  function closeSettings() { $('settingsOverlay').hidden = true; }
+
   // ---- אתחול ----
   function init() {
     // מילוי בורר סוגי צורניים
     const sel = $('figType');
     Object.keys(G.FIGURATE).forEach(k => { const o = el('option', '', G.FIGURATE[k].he); o.value = k; sel.appendChild(o); });
+
+    // הגדרות
+    if ($('settingsBtn')) $('settingsBtn').onclick = openSettings;
+    if ($('settingsClose')) $('settingsClose').onclick = closeSettings;
+    if ($('settingsOverlay')) $('settingsOverlay').addEventListener('click', e => { if (e.target === $('settingsOverlay')) closeSettings(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('settingsOverlay') && !$('settingsOverlay').hidden) closeSettings(); });
 
     $('mainInput').addEventListener('input', refresh);
     if ($('clearInput')) $('clearInput').addEventListener('click', () => { $('mainInput').value = ''; refresh(); $('mainInput').focus(); });
