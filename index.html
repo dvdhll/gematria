@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f2e7cc">
-  <title>מחשבון גימטרייה</title>
-  <meta name="description" content="מחשבון גימטרייה מתקדם — כל שיטות החישוב, פעולות הכפל, מספרים צורניים, סדרות וחתך זהב, וחיפוש הפוך בתנ״ך.">
+  <title>מחשבון גימטריא</title>
+  <meta name="description" content="מחשבון גימטריא מתקדם — כל שיטות החישוב, פעולות הכפל, מספרים צורניים, סדרות וחתך זהב, וחיפוש הפוך בתנ״ך.">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -54,7 +54,7 @@
       <button id="settingsBtn" class="settings-btn" type="button" aria-label="הגדרות">
         <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54a.49.49 0 0 0-.48-.41h-3.84a.49.49 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87a.49.49 0 0 0 .12.61l2.03 1.58c-.05.31-.07.63-.07.94s.02.63.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.13.22.39.3.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 0 0-.12-.61l-2.03-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg>
       </button>
-      <h1>מחשבון גימטרייה<span class="crown">א</span></h1>
+      <h1>מחשבון גימטריא<span class="crown">א</span></h1>
       <p class="tagline">כל דרכי החישוב · פעולות · מספרים צורניים · חיפוש בתנ״ך</p>
     </div>
   </header>
@@ -260,7 +260,7 @@
         var text = String(sel).trim();
         if (heb(text).length < 2 || text.length > 300) { hide(); return; }
         cur = text;
-        btnCalc.textContent = 'גימטריה · ' + val(text);
+        btnCalc.textContent = 'גימטריא · ' + val(text);
         var r; try { r = sel.getRangeAt(0).getBoundingClientRect(); } catch(e){ hide(); return; }
         if (!r || (!r.width && !r.height)) { hide(); return; }
         menu.classList.add('on');
@@ -349,7 +349,7 @@
         window.addEventListener('beforeinstallprompt', function (e) {
           e.preventDefault();
           deferred = e;
-          txt.innerHTML = 'התקינו את <b>מחשבון הגימטרייה</b> במכשיר — עובד גם בלי אינטרנט';
+          txt.innerHTML = 'התקינו את <b>מחשבון הגימטריא</b> במכשיר — עובד גם בלי אינטרנט';
           btn.hidden = false;
           show();
         });

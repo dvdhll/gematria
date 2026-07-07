@@ -45,7 +45,7 @@
   --comment:#f5f1fd; --comment-bg:#ffffff12; --border:#ffffff2e; --green:#2bd595; --red:#ff7e9a;
   --on-accent:#262036; --gold-soft:#ece4ff26; --shadow:0 8px 32px #00000045;
 }
-/* מיפוי השמות הפנימיים של הגימטרייה → משתני הערכה (על body, כדי שיתעדכנו עם הערכה) */
+/* מיפוי השמות הפנימיים של הגימטריא → משתני הערכה (על body, כדי שיתעדכנו עם הערכה) */
 body{
   --ink:var(--text); --gold:var(--accent); --line:var(--border);
   --navy:var(--text); --navy2:var(--muted); --well:var(--comment-bg); --ok:var(--green,#16a06b);
