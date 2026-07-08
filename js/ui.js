@@ -1,7 +1,7 @@
 /* ui.js — קישור הממשק למנוע */
 (function () {
   'use strict';
-  const APP_VERSION = '1.0.27';   // לעדכן יחד עם גרסת ה-service worker
+  const APP_VERSION = '1.0.28';   // לעדכן יחד עם גרסת ה-service worker
   const G = window.Gem, S = window.GemSearch;
   const $ = id => document.getElementById(id);
   const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
