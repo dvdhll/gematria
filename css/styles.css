@@ -345,3 +345,6 @@ footer i{color:var(--navy)}
   #mainInput{font-size:1.25rem}
   .grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
 }
+
+/* סימן ה"פלוס" היהודי (﬩) יושב מעט גבוה — הנמכה קלה */
+.plus{position:relative; top:.09em}
