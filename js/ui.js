@@ -1,7 +1,7 @@
 /* ui.js — קישור הממשק למנוע */
 (function () {
   'use strict';
-  const APP_VERSION = '1.0.24';   // לעדכן יחד עם גרסת ה-service worker
+  const APP_VERSION = '1.0.25';   // לעדכן יחד עם גרסת ה-service worker
   const G = window.Gem, S = window.GemSearch;
   const $ = id => document.getElementById(id);
   const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
@@ -16,8 +16,8 @@
     { key: 'katanAcharon', name: 'קטן מספרי אחרון', desc: 'צמצום לספרה בודדת', fn: t => G.katanMispariAcharon(t) },
     { key: 'gadol',     name: 'גדול', desc: 'סופיות 500–900', fn: t => G.hechrechi(t, { sofit: true }) },
     { key: 'milui',     name: 'מילוי (שמי)', desc: 'איות שם כל אות', fn: t => G.milui(t) },
-    { key: 'imHakolel', name: 'עם הכולל', desc: 'הכרחי + 1', fn: t => G.imHakolel(t) },
-    { key: 'mosaf',     name: 'מוסף', desc: 'הכרחי + מספר האותיות', fn: t => G.mosaf(t) },
+    { key: 'imHakolel', name: 'עם הכולל', desc: 'הכרחי ﬩ 1', fn: t => G.imHakolel(t) },
+    { key: 'mosaf',     name: 'מוסף', desc: 'הכרחי ﬩ מספר האותיות', fn: t => G.mosaf(t) },
     { key: 'merubaKlali', name: 'מרובע כללי', desc: 'הערך בריבוע', fn: t => G.merubaKlali(t) },
     { key: 'merubaPrati', name: 'מרובע פרטי', desc: 'סכום ריבועי האותיות', fn: t => G.merubaPrati(t) },
     { key: 'hakaah',    name: 'הכאה', desc: 'מכפלת האותיות', fn: t => G.hakaah(t) },
@@ -135,7 +135,7 @@
       rows = `<div class="sub">${parts.join(' × ')} = <b class="hl">${value}</b></div>`;
     } else if (m.key === 'merubaPrati') {
       const parts = [...G.onlyLetters(currentText)].map(ch => { const x=G.letterValue(ch,'hechrechi'); return `${x}²`; });
-      rows = `<div class="sub">${parts.join(' + ')} = <b class="hl">${value}</b></div>`;
+      rows = `<div class="sub">${parts.join(' ﬩ ')} = <b class="hl">${value}</b></div>`;
     } else if (m.key === 'milui') {
       const chips = [...G.onlyLetters(currentText)].map(ch => {
         const base = G.FINAL_TO_BASE[ch] || ch; const name = G.MILUI[base] || ch;
@@ -249,7 +249,7 @@
     items.push(`<span class="np-item"><span class="np-label">סכום מחלקים</span><b>${dv.sum}</b></span>`);
     if (!prime && ys != null) items.push(`<span class="np-item"><span class="np-label">יסוד</span><b>${ys}</b></span>`);
     if (mk && !prime) items.push(`<span class="np-item"><span class="np-label">מקור</span><b>${mk.value}</b></span>`);
-    if (mk && !prime && ys != null) items.push(`<span class="np-item"><span class="np-label">יסוד+מקור</span><b>${ys + mk.value}</b></span>`);
+    if (mk && !prime && ys != null) items.push(`<span class="np-item"><span class="np-label">יסוד﬩מקור</span><b>${ys + mk.value}</b></span>`);
     // זיהוי צורני — רק אם יש
     const figs = G.identifyFigurate(n);
     figs.forEach(h => items.push(`<span class="np-item np-fig">${G.FIGURATE[h.type].he} ה-${h.index}</span>`));
@@ -291,7 +291,7 @@
     const ys = G.yesod(n);
     $('primeYesod').innerHTML = G.isPrimeNum(n)
       ? `<span class="sub">מספר ראשוני — היסוד הוא המספר עצמו: <b class="hl">${ys}</b></span>`
-      : `${f.map(x => Array(x.k).fill(x.p).join(' + ')).join(' + ')} = <b class="r-big">${ys}</b>${findBtn(ys)}`;
+      : `${f.map(x => Array(x.k).fill(x.p).join(' ﬩ ')).join(' ﬩ ')} = <b class="r-big">${ys}</b>${findBtn(ys)}`;
 
     // מקור
     const mk = G.makor(n);
@@ -307,7 +307,7 @@
     // יסוד + מקור
     if (mk && ys != null) {
       const t = ys + mk.value;
-      $('primeYM').innerHTML = `${ys} + ${mk.value} = <b class="r-big">${t}</b>${findBtn(t)}`;
+      $('primeYM').innerHTML = `${ys} ﬩ ${mk.value} = <b class="r-big">${t}</b>${findBtn(t)}`;
     } else $('primeYM').innerHTML = '<span class="sub">—</span>';
   }
 
